@@ -25,12 +25,15 @@ class AsyncBehaviorTree {
     'forcesuccess':true,
   };
 
-
-  constructor(xml: string, public bb: any) {
+  constructor(xml: string, public bb: any, public warningCb?: {(m: string): void}) {
     const opts = {
       explicitChildren: true,
       preserveChildrenOrder: true,
     };
+
+    if( this.warningCb == undefined ) {
+      this.warningCb = this.consoleLogWarning.bind(this);
+    }
 
     let parser = new xml2js.Parser(opts);
 
@@ -45,6 +48,11 @@ class AsyncBehaviorTree {
 
   // istanbul ignore next
   warning(t: string) {
+    this.warningCb(t);
+  }
+
+  // istanbul ignore next
+  consoleLogWarning(t: string): void {
     if(this.printWarnings) {
       const prefix = 'ABT Warning: ';
       console.log(prefix + t);
