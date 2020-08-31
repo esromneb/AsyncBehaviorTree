@@ -9,6 +9,7 @@ AsyncBehaviorTree
 
 const testTree13 = require("./btrees/testTree13.xml");
 const testTree14 = require("./btrees/testTree14.xml");
+const testTree14a = require("./btrees/testTree14a.xml");
 const testTree15 = require("./btrees/testTree15.xml");
 const testTree16 = require("./btrees/testTree16.xml");
 const testTree16_default = require("./btrees/testTree16_default.xml");
@@ -41,6 +42,8 @@ function reset() {
   };
   blackBoard2.baz = "Baz is unnested";
   delete blackBoard2.long;
+
+  blackBoard2.altOutputD = false;
 
   blackBoard3.foo = 'default string';
 }
@@ -78,6 +81,7 @@ test("test condition", async function(done) {
 
 
 let blackBoard2: any = {
+  altOutputD: false,
   called: [],
   inOnlyA: (opts: any = {})=>{
     // const opts = merge({frames: 1, stagger:1}, _opts);
@@ -139,10 +143,22 @@ let blackBoard2: any = {
 
     let ret = 'outOnlyD' in fail ? false : true;
 
-    let o = {
-      ret: ret,
-      out0: 'should keep outOnlyD'
-    };
+    let o;
+    // FIXME issue #1
+    if( blackBoard2.altOutputD ) {
+      o = {
+        ret: ret,
+        out0: 'should keep outOnlyD',
+        outB: 'going to B',
+        outC: 'going to C',
+      };
+
+    } else {
+      o = {
+        ret: ret,
+        out0: 'should keep outOnlyD'
+      };
+    }
 
     return o;
   },
@@ -266,6 +282,84 @@ test("test args", async function(done) {
   expect(blackBoard2.baz).not.toBe("Baz is unnested");
   expect(blackBoard2.baz).toBe('should keep outOnlyC');
   expect(blackBoard2.long.untraveled.path).toBe('should keep outOnlyF');
+
+
+  done();
+
+});
+
+
+test("test multiple output ports and warn when not filled", async function(done) {
+
+  let print: boolean = false;
+
+  let warnings = [];
+
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree14a, blackBoard2, (m)=>{warnings.push(m)});
+
+  dut.printCall = false;
+  dut.printParse = false;
+  dut.warnWhenOutputNotFilled = true;
+
+
+  reset();
+
+  blackBoard2.altOutputD = true;
+
+  await dut.execute();
+
+  // console.log(blackBoard2.called);
+  // console.log(blackBoard2);
+
+  // console.log(blackBoard2.foo);
+
+  expect(blackBoard2.baz).not.toBe("Baz is unnested");
+  expect(blackBoard2.baz).toBe('should keep outOnlyC');
+  expect(blackBoard2.long.untraveled.path).toBe('should keep outOnlyF');
+
+  expect(blackBoard2.foo.outB).toBe('going to B');
+  expect(blackBoard2.foo.outC).toBe('going to C');
+  expect(warnings.length).toBe(0); // if not true we are getting other warnings
+
+
+  // console.log(warnings);
+
+
+  reset();
+
+  warnings = [];
+
+  blackBoard2.altOutputD = false; // switch function to different output
+  dut.warnWhenOutputNotFilled = true; // warn when outputs are not filled
+
+  await dut.execute();
+
+  // console.log(blackBoard2.called);
+  // console.log(blackBoard2);
+
+  // console.log(blackBoard2.foo);
+
+  expect(blackBoard2.baz).not.toBe("Baz is unnested");
+  expect(blackBoard2.baz).toBe('should keep outOnlyC');
+  expect(blackBoard2.long.untraveled.path).toBe('should keep outOnlyF');
+
+  expect(warnings.length).not.toBe(0);
+
+  // console.log(warnings);
+  for(const w of warnings) {
+    expect(w).toMatch('outOnlyD');
+    expect(w).toMatch('did not set value');
+    expect(w).toMatch('output port');
+    // expect(w).toBe.stringContaining('foo');
+
+  }
+
+  // expect(blackBoard2.foo.outB).toBe('going to B');
+  // expect(blackBoard2.foo.outC).toBe('going to C');
+
+
+
 
 
   done();

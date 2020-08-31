@@ -13,6 +13,7 @@ class AsyncBehaviorTree {
   printWarnings: boolean = true;
   warnUndefinedReturn: boolean = true;
   warnWhenCreatingNewObjects: boolean = false;
+  warnWhenOutputNotFilled: boolean = false;
   printWrites: boolean = false;
 
   debugDoStrip: boolean = false;
@@ -252,6 +253,9 @@ class AsyncBehaviorTree {
         if( port.name in result ) {
           rawValue = node.args[port.name];
         } else {
+          if( this.warnWhenOutputNotFilled ) {
+            this.warning(`Calling function '${node.name}' did not set value for output port 'port.name'`);
+          }
           continue; // function did not provide an output for this port
         }
 
