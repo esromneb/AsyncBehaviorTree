@@ -272,6 +272,53 @@ test("test args", async function(done) {
 });
 
 
+test("test undefined blackboard value", async function(done) {
+
+  let print: boolean = false;
+
+  let warnings = [];
+
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree14, blackBoard2, (m)=>{warnings.push(m)});
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  reset();
+  fail['outOnlyA'] = true;
+
+  blackBoard2.foo = {
+  };
+
+  await dut.execute();
+
+
+
+
+  const expected =[   [ 'inOnlyA', { in0: '' } ],
+    [ 'inOnlyB', { in0: 'ice' } ],
+    [ 'inOnlyB', { in0: 'foo' } ],
+    [ 'inOnlyA', { in0: undefined } ],
+  ];
+
+  for(let i = 0; i < 4; i++ ) {
+    expect(blackBoard2.called[i]).toStrictEqual(expected[i]);
+  }
+
+  // console.log(blackBoard2);
+
+  // console.log(warnings);
+
+  expect(blackBoard2.foo).toStrictEqual({});
+  // expect(blackBoard2.baz).toBe("Baz is unnested");
+
+  done()
+
+
+});
+
+
 
 
 

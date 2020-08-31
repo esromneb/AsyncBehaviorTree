@@ -111,6 +111,7 @@ class AsyncBehaviorTree {
     for(let i = 0; i < ls.length; i++) {
       let layer = ls[i];
       if(unpack[layer] == undefined) {
+        this.warning(`got 'undefined' value from blackboard when looking for '${layer}' of '${rawValue}'`);
         return undefined;
       }
 
