@@ -12,6 +12,7 @@ class AsyncBehaviorTree {
   printCall: boolean = false;
   printWarnings: boolean = true;
   warnUndefinedReturn: boolean = true;
+  warnWhenCreatingNewObjects: boolean = false;
   printWrites: boolean = false;
 
   debugDoStrip: boolean = false;
@@ -146,14 +147,19 @@ class AsyncBehaviorTree {
     for(i = 0; i < ls.length-1; i++) {
       layer = ls[i];
       if(unpack[layer] == undefined) {
+        if( this.warnWhenCreatingNewObjects ) {
+          this.warning(`making new object on blackboard '${layer}' while writing to '${rawValue}'`);
+        }
         unpack[layer] = {};
       }
 
       unpack = unpack[layer]
     }
 
+
+    // istanbul ignore if
     if( unpack == undefined ) {
-      this.warning("Loop in detectAndStoreBraceValues() failed to set undefined");
+      this.warning("Internal Error: Loop in detectAndStoreBraceValues() failed to set undefined for '${rawValue}'");
       return false;
     }
 

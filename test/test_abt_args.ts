@@ -9,6 +9,7 @@ AsyncBehaviorTree
 
 const testTree13 = require("./btrees/testTree13.xml");
 const testTree14 = require("./btrees/testTree14.xml");
+const testTree14a = require("./btrees/testTree14a.xml");
 const testTree15 = require("./btrees/testTree15.xml");
 const testTree16 = require("./btrees/testTree16.xml");
 const testTree16_default = require("./btrees/testTree16_default.xml");
@@ -40,6 +41,7 @@ function reset() {
     baz: "yes this is baz",
   };
   blackBoard2.baz = "Baz is unnested";
+  delete blackBoard2.long;
 
   blackBoard3.foo = 'default string';
 }
@@ -272,7 +274,7 @@ test("test args", async function(done) {
 });
 
 
-test("test undefined blackboard value", async function(done) {
+test("test undefined fetch blackboard value", async function(done) {
 
   let print: boolean = false;
 
@@ -317,6 +319,58 @@ test("test undefined blackboard value", async function(done) {
 
 
 });
+
+
+test("test warn create new objects", async function(done) {
+
+  let print: boolean = false;
+
+  let warnings = [];
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree14, blackBoard2, (m)=>{warnings.push(m)});
+
+  dut.printCall = false;
+  dut.printParse = false;
+  dut.warnWhenCreatingNewObjects = false;
+
+
+  reset();
+  await dut.execute();
+
+  expect(blackBoard2.baz).not.toBe("Baz is unnested");
+  expect(blackBoard2.baz).toBe('should keep outOnlyC');
+  expect(blackBoard2.long.untraveled.path).toBe('should keep outOnlyF');
+
+  // verify we are getting no warnings
+  expect(warnings).toStrictEqual([]);
+
+
+
+  dut.warnWhenCreatingNewObjects = true;
+
+  reset();
+  // blackboard reset is not correcly deleting this
+  delete blackBoard2.long;
+  await dut.execute();
+
+  // console.log(blackBoard2.called);
+  // console.log(blackBoard2);
+
+  expect(blackBoard2.baz).not.toBe("Baz is unnested");
+  expect(blackBoard2.baz).toBe('should keep outOnlyC');
+  expect(blackBoard2.long.untraveled.path).toBe('should keep outOnlyF');
+
+  // we should get 2 warnings, too lazy to parse into the text
+  expect(warnings.length).toBe(2);
+
+
+
+
+  done();
+
+});
+
+
 
 
 
