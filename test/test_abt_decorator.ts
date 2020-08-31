@@ -1,17 +1,11 @@
 const assert = require("assert");
 
-
-
-
 import {
 AsyncBehaviorTree
 } from "../src/AsyncBehaviorTree";
 
-import {
-testTree11,
-testTree12,
-} from "../src/AsyncBehaviorTreeData";
-
+const testTree11 = require("./btrees/testTree11.xml");
+const testTree12 = require("./btrees/testTree12.xml");
 
 
 let fail = {};

@@ -7,11 +7,10 @@ import {
 AsyncBehaviorTree
 } from "../src/AsyncBehaviorTree";
 
-import {
-testTree9,
-testTree10,
-testTree11,
-} from "../src/AsyncBehaviorTreeData";
+const testTree9 = require("./btrees/testTree9.xml");
+const testTree10 = require("./btrees/testTree10.xml");
+const testTree11 = require("./btrees/testTree11.xml");
+
 
 
 test("nested sequence", async function(done) {

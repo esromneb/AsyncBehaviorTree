@@ -7,12 +7,10 @@ import {
 AsyncBehaviorTree
 } from "../src/AsyncBehaviorTree";
 
-import {
-testTree13,
-testTree14,
-testTree15,
-testTree16,
-} from "../src/AsyncBehaviorTreeData";
+const testTree13 = require("./btrees/testTree13.xml");
+const testTree14 = require("./btrees/testTree14.xml");
+const testTree15 = require("./btrees/testTree15.xml");
+const testTree16 = require("./btrees/testTree16.xml");
 
 
 
