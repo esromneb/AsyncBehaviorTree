@@ -1,0 +1,27 @@
+{
+  "name": "AsyncBehaviorTree",
+  "version": "0.5.0",
+  "description": "Behavior Tree library focusing on async functions",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+git@github.com:esromneb/AsyncBehaviorTree.git"
+  },
+  "keywords": [
+    "Behavior Tree",
+    "Groot",
+    "async"
+  ],
+  "author": "Benjamin Morse",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/esromneb/AsyncBehaviorTree/issues"
+  },
+  "homepage": "https://github.com/esromneb/AsyncBehaviorTree#readme"
+}
