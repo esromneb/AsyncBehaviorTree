@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <Action ID="addObjOut" _in_0="1" _in_1="2" out="${foo}"/>
+            <Action ID="add" _in_0="" _in_1="" _out_0="${zaz}"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="add">
+            <input_port default="99" name="_in_0"/>
+            <input_port default="99" name="_in_1"/>
+            <output_port name="_out_0"/>
+        </Action>
+        <Action ID="addObjOut">
+            <input_port name="_in_0"/>
+            <input_port name="_in_1"/>
+            <output_port name="out"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

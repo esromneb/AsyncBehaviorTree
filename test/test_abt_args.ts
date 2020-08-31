@@ -11,7 +11,7 @@ const testTree13 = require("./btrees/testTree13.xml");
 const testTree14 = require("./btrees/testTree14.xml");
 const testTree15 = require("./btrees/testTree15.xml");
 const testTree16 = require("./btrees/testTree16.xml");
-
+const testTree16_default = require("./btrees/testTree16_default.xml");
 
 
 let fail = {};
@@ -276,6 +276,12 @@ test("test args", async function(done) {
 
 
 
+
+
+
+
+
+
 let blackBoard3: any = {
   called: [],
   inoutA: (opts: any = {})=>{
@@ -437,6 +443,37 @@ test("test unnamed ports", async function(done) {
 
   expect(blackBoard3.foo).toBe(3);
   expect(blackBoard3.zaz).toBe(7);
+
+  if( print ) {
+    console.log(blackBoard3);
+  }
+
+  done();
+});
+
+
+test("test unnamed ports default", async function(done) {
+
+  let print: boolean = false;
+
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree16_default, blackBoard3);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  reset();
+  // fail['outOnlyA'] = true;
+  await dut.execute();
+
+  if( print ) {
+    console.log(blackBoard3.called);
+    console.log(blackBoard3);
+  }
+
+  expect(blackBoard3.foo).toBe(3);
+  expect(blackBoard3.zaz).toBe(198);
 
   if( print ) {
     console.log(blackBoard3);
