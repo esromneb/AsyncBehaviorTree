@@ -9,9 +9,10 @@ class AsyncBehaviorTree {
   exe: any = [];
 
   printParse: boolean = false;
-  printCall: boolean = true;
+  printCall: boolean = false;
   printWarnings: boolean = true;
   warnUndefinedReturn: boolean = true;
+  printWrites: boolean = false;
 
   debugDoStrip: boolean = false;
 
@@ -42,6 +43,7 @@ class AsyncBehaviorTree {
     this.exe = null;
   }
 
+  // istanbul ignore next
   warning(t: string) {
     if(this.printWarnings) {
       const prefix = 'ABT Warning: ';
@@ -50,6 +52,7 @@ class AsyncBehaviorTree {
   }
 
   evaluateCondition(n: string): boolean {
+    // istanbul ignore if
     if( this.printCall ) {
       console.log(`checking condition ${n}`);
     }
@@ -86,6 +89,7 @@ class AsyncBehaviorTree {
 
     const lookup = rawTrimmed.slice(2,rawTrimmed.length-1);
 
+    // istanbul ignore if
     if( this.printCall ) {
       console.log(`looking up: '${lookup}'`);
     }
@@ -119,6 +123,7 @@ class AsyncBehaviorTree {
 
     const lookup = rawTrimmed.slice(2,rawTrimmed.length-1);
 
+    // istanbul ignore if
     if( this.printCall ) {
       console.log(`store looking up: '${lookup}'`);
     }
@@ -139,7 +144,7 @@ class AsyncBehaviorTree {
     }
 
     if( unpack == undefined ) {
-      console.log("Loop in detectAndStoreBraceValues() failed to set undefined");
+      this.warning("Loop in detectAndStoreBraceValues() failed to set undefined");
       return false;
     }
 
@@ -237,6 +242,7 @@ class AsyncBehaviorTree {
 
         const gotBack = result[port.name];
 
+        // istanbul ignore if
         if( gotBack == undefined ) {
           this.warning(`${rawValue} was not found in result object`);
           continue;
@@ -272,7 +278,10 @@ class AsyncBehaviorTree {
 
         const gotBack = result;
 
-        console.log(`writing ${gotBack} to ${rawValue}`);
+        // istanbul ignore if
+        if( this.printWrites ) {
+          console.log(`writing ${gotBack} to ${rawValue}`);
+        }
 
         worked2 = this.detectAndStoreBraceValues(rawValue, gotBack);
         worked = true;
@@ -295,6 +304,7 @@ class AsyncBehaviorTree {
 
     const n: string = node.name;
 
+    // istanbul ignore if
     if( this.printCall ) {
       console.log(`calling ${n}`);
     }
@@ -543,6 +553,7 @@ class AsyncBehaviorTree {
 
     let unpack = exe;
 
+    // istanbul ignore if
     if( this.printParse ) {
       console.log(`path: ${_path} fn: ${x} h: ${hierarchy}`);
     }
@@ -609,8 +620,8 @@ class AsyncBehaviorTree {
       this.stripTree(result.root);
     }
 
+    // istanbul ignore if
     if( this.printParse ) {
-
       console.log("prune");
     }
 
@@ -629,6 +640,7 @@ class AsyncBehaviorTree {
 
     this.recurse(f, 0, "0.", "root.");
 
+    // istanbul ignore if
     if( this.printParse ) {
       console.log(JSON.stringify(this.exe));
       console.log('done');

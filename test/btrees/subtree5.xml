@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <SubTree ID="collectTree"/>
+            <SubTree ID="dumpTree"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="collectTree">
+        <Sequence>
+            <Action ID="go1"/>
+            <Action ID="go2"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <BehaviorTree ID="dumpTree">
+        <Fallback>
+            <Action ID="go1"/>
+            <Action ID="go2"/>
+        </Fallback>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <SubTree ID="collectTree"/>
+        <SubTree ID="dumpTree"/>
+        <Action ID="go1"/>
+        <Action ID="go2"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

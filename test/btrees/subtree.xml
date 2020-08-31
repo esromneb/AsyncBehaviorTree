@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+	<BehaviorTree ID="PickingItem">
+            <Action ID = "AdjustTCPOrientation"/>
+    </BehaviorTree>
+    <BehaviorTree ID="MoveToPredefinedPoint">
+            <Action ID = "LinearMove"/>
+    </BehaviorTree>
+
+    <BehaviorTree ID="MainTree">
+        <Sequence name="move from bin A to bin B">
+            <SubTree ID = "MoveToPredefinedPoint"/>
+            <SubTree ID = "PickingItem"/>
+        </Sequence>
+    </BehaviorTree>
+</root>

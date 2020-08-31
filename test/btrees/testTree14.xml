@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence name="Sequence1">
+            <Action ID="inOnlyA" in0=""/>
+            <Action ID="inOnlyB" in0="ice"/>
+            <Action ID="inOnlyB" in0=""/>
+            <Action ID="inOnlyA" in0="  ${foo.baz}"/>
+            <Action ID="outOnlyA" out0=""/>
+            <Action ID="outOnlyB" out0="baz"/>
+            <Action ID="outOnlyC" out0="${baz}"/>
+            <Action ID="outOnlyD" out0="${foo.goo}"/>
+            <Action ID="outOnlyE" out0="${fan}"/>
+            <Action ID="outOnlyF" out0="${long.untraveled.path}"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="inOnlyA">
+            <input_port name="in0"/>
+        </Action>
+        <Action ID="inOnlyB">
+            <input_port default="foo" name="in0"/>
+        </Action>
+        <Action ID="outOnlyA">
+            <output_port name="out0"/>
+        </Action>
+        <Action ID="outOnlyB">
+            <output_port default="${baz}" name="out0"/>
+        </Action>
+        <Action ID="outOnlyC">
+            <output_port name="out0"/>
+        </Action>
+        <Action ID="outOnlyD">
+            <output_port name="out0"/>
+        </Action>
+        <Action ID="outOnlyE">
+            <output_port name="out0"/>
+        </Action>
+        <Action ID="outOnlyF">
+            <output_port name="out0"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

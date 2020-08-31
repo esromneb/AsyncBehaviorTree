@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence name="Sequence1">
+            <Action ID="go1"/>
+            <Sequence name="Sequence2">
+                <Action ID="stay1"/>
+                <Action ID="stay2"/>
+                <Sequence name="Sequence3">
+                    <Action ID="go1"/>
+                    <Action ID="go2"/>
+                    <Action ID="go3"/>
+                </Sequence>
+            </Sequence>
+            <Action ID="go2"/>
+            <Action ID="go3"/>
+            <Sequence name="Sequence4">
+                <Action ID="go1"/>
+                <Action ID="go2"/>
+            </Sequence>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="dumpRun"/>
+        <Action ID="go1"/>
+        <Action ID="go2"/>
+        <Action ID="go3"/>
+        <Action ID="goClosestR"/>
+        <Condition ID="isFull"/>
+        <Action ID="mineResources"/>
+        <Action ID="moveBaseToGoal">
+            <inout_port name="key_name">goal</inout_port>
+        </Action>
+        <Action ID="stay1"/>
+        <Action ID="stay2"/>
+        <Action ID="waitFrames">
+            <output_port name="barout"/>
+            <inout_port name="baz"/>
+            <input_port name="fooin"/>
+            <input_port default="15" name="frames">frames</input_port>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

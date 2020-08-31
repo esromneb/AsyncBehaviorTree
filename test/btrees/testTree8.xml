@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence name="Sequence1">
+            <Action ID="goClosestR"/>
+            <Action ID="waitFrames2" frames="30"/>
+            <Action ID="waitFrames3" d_one="4" d_zero="" frames="{pauseAtMine}" stagger="{sight}"/>
+            <Action ID="mineResource"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="dumpRun"/>
+        <Action ID="go1"/>
+        <Action ID="go2"/>
+        <Action ID="go3"/>
+        <Action ID="goClosestR"/>
+        <Condition ID="isFull"/>
+        <Action ID="mineResource"/>
+        <Action ID="mineResources"/>
+        <Action ID="moveBaseToGoal">
+            <input_port name="key_name">goal</input_port>
+        </Action>
+        <Action ID="stay1"/>
+        <Action ID="stay2"/>
+        <Action ID="waitFrames">
+            <output_port name="barout"/>
+            <input_port name="baz"/>
+            <input_port name="fooin"/>
+            <input_port default="15" name="frames">frames</input_port>
+        </Action>
+        <Action ID="waitFrames2">
+            <input_port default="15" name="frames">frames</input_port>
+        </Action>
+        <Action ID="waitFrames3">
+            <inout_port default="4" name="d_one">has default</inout_port>
+            <inout_port name="d_zero">d1</inout_port>
+            <input_port default="2" name="frames"/>
+            <input_port name="stagger">not a real argument, the other has a default</input_port>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <Fallback>
+                <Sequence>
+                    <Action ID="go1"/>
+                </Sequence>
+            </Fallback>
+            <Action ID="go2"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="alwaysTrue"/>
+        <Action ID="dumpRun"/>
+        <Action ID="go1"/>
+        <Action ID="go2"/>
+        <Action ID="go3"/>
+        <Action ID="goClosestR"/>
+        <Action ID="guardAiMovement"/>
+        <Action ID="isFull"/>
+        <Action ID="mineResource"/>
+        <Action ID="waitFrames">
+            <input_port name="_in_0"/>
+        </Action>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
