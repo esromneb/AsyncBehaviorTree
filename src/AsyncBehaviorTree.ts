@@ -334,8 +334,9 @@ class AsyncBehaviorTree {
     if( !found ) {
       // node.name isn't found in functionDescriptions
       // not sure how possible it is to get here
-      this.warning(`${n} was not found in functionDescriptions`);
-      result = await this.bb[n]();
+      this.warning(`Action block '${n}'' was not found in '<TreeNodesModel>'.  Probably malformed XML.`);
+      return false;
+      // result = await this.bb[n]();
     } else {
 
 

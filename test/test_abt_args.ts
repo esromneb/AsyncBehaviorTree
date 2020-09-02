@@ -10,6 +10,7 @@ AsyncBehaviorTree
 const testTree13 = require("./btrees/testTree13.xml");
 const testTree14 = require("./btrees/testTree14.xml");
 const testTree14a = require("./btrees/testTree14a.xml");
+const testTree14b = require("./btrees/testTree14b.xml");
 const testTree15 = require("./btrees/testTree15.xml");
 const testTree16 = require("./btrees/testTree16.xml");
 const testTree16a = require("./btrees/testTree16a.xml");
@@ -501,6 +502,38 @@ test("test function missing from blackboard", async function(done) {
 });
 
 
+
+// put a tree with the wrong blackboard to cause a function missing
+// warning
+test("test function missing xml", async function(done) {
+
+  let print: boolean = false;
+
+  let warnings = [];
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree14b, blackBoard2, (m)=>{warnings.push(m)});
+
+  dut.printCall = false;
+  dut.printParse = false;
+  dut.warnWhenCreatingNewObjects = false;
+
+
+  reset();
+  await dut.execute();
+
+
+  if( print ) {
+    console.log(warnings);
+  }
+
+  const w = warnings[0];
+  expect(w).toMatch('inOnlyA');
+  expect(w).toMatch('Probably malformed XML');
+
+
+  done();
+
+});
 
 
 
