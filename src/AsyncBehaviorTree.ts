@@ -446,6 +446,7 @@ class AsyncBehaviorTree {
           // do nothing, see logic below
           break;
         } else {
+          // istanbul ignore next
           throw new Error(`unhandled pop in failup: ${types[ptr]}`);
         }
       }
@@ -466,6 +467,7 @@ class AsyncBehaviorTree {
         node = collection.shift();
       }
 
+      // istanbul ignore if
       if(node == undefined) {
         throw new Error(`node cannot be undefined here`);
       }
@@ -473,6 +475,7 @@ class AsyncBehaviorTree {
       if( node.w in nesting ) {
         ptr++;
 
+        // istanbul ignore if
         if( pending[ptr] && pending[ptr].length ) {
           throw new Error(`pending[ptr] cannot have nodes at creation`);
         }
@@ -483,6 +486,7 @@ class AsyncBehaviorTree {
 
         pending[ptr].unshift(...node.seq);
 
+        // istanbul ignore if
         if( this.printCall ) {
           console.log(`nesting ${node.w}`);
         }
@@ -517,6 +521,7 @@ class AsyncBehaviorTree {
 
 
       } else {
+        // istanbul ignore next
         throw new Error(`Unknown walk type: ${node.w}`);
       }
 
@@ -545,6 +550,7 @@ class AsyncBehaviorTree {
           // we must mark anypass as true for the new level for #35 (part 2)
           anypass[ptr] = true;
         } else {
+          // istanbul ignore next
           throw new Error(`Unknown types in finish pending: ${types[ptr]}`);
         }
         // break; // uncomment to cause issue #35
@@ -564,6 +570,7 @@ class AsyncBehaviorTree {
     const hs = hierarchy.split('.');
     const nesting = this.nestingTypes;
 
+    // istanbul ignore if
     if( ps.length != hs.length ) {
       throw new Error('illegal lengths passed to loadPath()');
     }
@@ -607,6 +614,7 @@ class AsyncBehaviorTree {
       } else if( type === 'condition' ) {
         unpack[i] = {w:type,name:x};
       } else {
+        // istanbul ignore next
         throw new Error(`loadPath()[3] Unknown type: ${type}`);
       }
 
@@ -634,6 +642,7 @@ class AsyncBehaviorTree {
     // delete result.root.$$[0].$$[0].$$[1].Action;
     // delete result.root.$$[0].$$[0].$$[1].Sequence;
 
+    // istanbul ignore if
     if( this.debugDoStrip ) {
       this.stripTree(result.root);
     }
@@ -644,6 +653,8 @@ class AsyncBehaviorTree {
     }
 
     this.p = result;
+
+    // istanbul ignore if
     if( this.printParse ) {
       console.log(this.p);
       console.log(JSON.stringify(result));
@@ -697,6 +708,7 @@ class AsyncBehaviorTree {
       this.loadPath(path+'0', hierarchy+taglow, fn, props);
 
     } else {
+      // istanbul ignore next
       throw new Error(`Unknown tag: ${tag}`);
     }
 
@@ -769,6 +781,8 @@ class AsyncBehaviorTree {
   // it returns the information in two formats in the same object
   // this is annoying as I want to see the structure using json stringify
   // so this function strips one copy of the data (the copy in the format I cannot use)
+
+  // istanbul ignore next
   stripTree(result: any) {
     let doomed: string[] = [];
     
