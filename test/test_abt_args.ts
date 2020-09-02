@@ -12,6 +12,7 @@ const testTree14 = require("./btrees/testTree14.xml");
 const testTree14a = require("./btrees/testTree14a.xml");
 const testTree15 = require("./btrees/testTree15.xml");
 const testTree16 = require("./btrees/testTree16.xml");
+const testTree16a = require("./btrees/testTree16a.xml");
 const testTree16_default = require("./btrees/testTree16_default.xml");
 
 
@@ -46,6 +47,7 @@ function reset() {
   blackBoard2.altOutputD = false;
 
   blackBoard3.foo = 'default string';
+  delete blackBoard3.zaz;
 }
 
 
@@ -475,7 +477,6 @@ test("test warn create new objects", async function(done) {
 
 
 
-
 let blackBoard3: any = {
   called: [],
   inoutA: (opts: any = {})=>{
@@ -675,3 +676,40 @@ test("test unnamed ports default", async function(done) {
 
   done();
 });
+
+
+
+
+test("test write unnamed ports to string", async function(done) {
+  let print: boolean = false;
+  let warnings = [];
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree16a, blackBoard3, (m)=>{warnings.push(m)});
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+  reset();
+  await dut.execute();
+
+  if( print ) {
+    console.log(blackBoard3.called);
+    console.log(blackBoard3);
+  }
+
+  expect(blackBoard3.foo).toBe(3);
+  expect(blackBoard3.zaz).toBe(undefined);
+
+  if( print ) {
+    console.log(blackBoard3);
+    console.log(warnings);
+  }
+
+  const w = warnings[0];
+  expect(w).toMatch('Action node');
+  expect(w).toMatch('not a var');
+  expect(w).toMatch('destination variable');
+
+  done();
+});
+

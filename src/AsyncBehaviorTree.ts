@@ -269,6 +269,7 @@ class AsyncBehaviorTree {
 
         this.detectAndStoreBraceValues(rawValue, gotBack);
 
+        // istanbul ignore if
         if( this.printCall ) {
           console.log(`set ${port.name} to ${rawValue} , ${gotBack}`);
         }
@@ -285,8 +286,7 @@ class AsyncBehaviorTree {
 
     const key = '_out_0';
 
-    let worked: boolean = false;
-    let worked2: boolean = false;
+    // let worked: boolean = false;
 
 
     for(let i = 0; i < found.ports.length; i++) {
@@ -302,21 +302,13 @@ class AsyncBehaviorTree {
           console.log(`writing ${gotBack} to ${rawValue}`);
         }
 
-        worked2 = this.detectAndStoreBraceValues(rawValue, gotBack);
-        worked = true;
+        const worked = this.detectAndStoreBraceValues(rawValue, gotBack);
         
+        if( !worked ) {
+          this.warning(`Action node '${node.name}' tried to use the string '${rawValue}' as a destination variable for the output port '${key}'`);
+        }
       }
     }
-
-    if( !worked ) {
-      console.log('handleOutArgs() worked was false');
-    }
-
-    if( !worked2 ) {
-      console.log('handleOutArgs() worked2 was false');
-    }
-
-
   }
 
   async callAction(node: any): Promise<boolean> {
