@@ -418,7 +418,6 @@ class AsyncBehaviorTree {
 
     if( this.destroyed ) {
       throw new Error("can't call execute() after AsyncBehaviorTree is destroyed");
-      return;
     }
 
     let collection = merge([], this.exe);

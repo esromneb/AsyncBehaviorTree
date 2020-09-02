@@ -46,6 +46,7 @@ function reset() {
   delete blackBoard2.long;
 
   blackBoard2.altOutputD = false;
+  blackBoard2.altOutputInOnlyA = false;
 
   blackBoard3.foo = 'default string';
   delete blackBoard3.zaz;
@@ -84,12 +85,17 @@ test("test condition", async function(done) {
 
 
 let blackBoard2: any = {
+  altOutputInOnlyA: false,
   altOutputD: false,
   called: [],
   inOnlyA: (opts: any = {})=>{
     // const opts = merge({frames: 1, stagger:1}, _opts);
 
     blackBoard2.called.push(['inOnlyA',opts]);
+
+    if( blackBoard2.altOutputInOnlyA ) {
+      return undefined;
+    }
 
     let ret = 'inOnlyA' in fail ? false : true;
 
@@ -534,6 +540,59 @@ test("test function missing xml", async function(done) {
   done();
 
 });
+
+
+
+// put a tree with the wrong blackboard to cause a function missing
+// warning
+test("test function undefined return", async function(done) {
+
+  let print: boolean = false;
+
+  let warnings = [];
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree14, blackBoard2, (m)=>{warnings.push(m)});
+
+
+  reset();
+
+  blackBoard2.altOutputInOnlyA = false;
+  await dut.execute();
+
+
+  if( print ) {
+    console.log(warnings);
+  }
+
+  expect(warnings.length).toBe(0);
+
+
+
+
+
+  reset();
+
+  blackBoard2.altOutputInOnlyA = true;
+  await dut.execute();
+
+
+  if( print ) {
+    console.log(warnings);
+  }
+
+  expect(warnings.length).toBe(1);
+
+
+  const w = warnings[0];
+  expect(w).toMatch('inOnlyA');
+  expect(w).toMatch('returned \'undefined\' and thus will fail');
+
+
+  done();
+});
+
+
+
 
 
 
