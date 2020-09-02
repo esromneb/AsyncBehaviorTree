@@ -466,6 +466,43 @@ test("test warn create new objects", async function(done) {
 });
 
 
+// put a tree with the wrong blackboard to cause a function missing
+// warning
+test("test function missing from blackboard", async function(done) {
+
+  let print: boolean = false;
+
+  let warnings = [];
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree14, blackBoard, (m)=>{warnings.push(m)});
+
+  dut.printCall = false;
+  dut.printParse = false;
+  dut.warnWhenCreatingNewObjects = false;
+
+
+  reset();
+  await dut.execute();
+
+
+  if( print ) {
+    console.log(warnings);
+  }
+
+  const w = warnings[0];
+  expect(w).toMatch('Function named');
+  expect(w).toMatch('inOnlyA');
+  expect(w).toMatch('was not found on blackboard');
+
+
+
+  done();
+
+});
+
+
+
+
 
 
 

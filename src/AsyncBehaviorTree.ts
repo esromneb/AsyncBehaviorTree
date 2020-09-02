@@ -320,6 +320,11 @@ class AsyncBehaviorTree {
       console.log(`calling ${n}`);
     }
 
+    if( !(n in this.bb) ) {
+      this.warning(`Function named '${n}' was not found on blackboard.`);
+      return false;
+    }
+
     let found = this.functionDescriptions[n];
 
     let result;
@@ -327,6 +332,8 @@ class AsyncBehaviorTree {
     let useOutArgsMode = false;
 
     if( !found ) {
+      // node.name isn't found in functionDescriptions
+      // not sure how possible it is to get here
       this.warning(`${n} was not found in functionDescriptions`);
       result = await this.bb[n]();
     } else {
@@ -359,7 +366,7 @@ class AsyncBehaviorTree {
 
 
     if( this.warnUndefinedReturn && result == undefined ) {
-      this.warning(`${n} returned 'undefined' and thus will fail`)
+      this.warning(`${n} returned 'undefined' and thus will fail`);
     }
 
     // if result was an object

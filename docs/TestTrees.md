@@ -6,3 +6,11 @@ This has some inputs and outputs that are named.  The test has a reused blackboa
 
 # testTree14a
 Same as 14 however outOnlyD has 3 outputs.
+
+
+# testTree16
+Uses unnamed output ports (aka `_in_0`).
+
+
+# testTree16a
+Same as 16 however one of the output ports is a string instead of a proper variable
