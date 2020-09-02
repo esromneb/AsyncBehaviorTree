@@ -211,7 +211,7 @@ class AsyncBehaviorTree {
     let foundNext = true;
     while(foundNext) {
       foundNext = false;
-      let key = `_in_${idx}`;
+      const key = `_in_${idx}`;
       for(let i = 0; i < found.ports.length; i++) {
         const port = found.ports[i];
         if( (port.dir in letin) && port.name === key  ) {
@@ -293,7 +293,7 @@ class AsyncBehaviorTree {
       const port = found.ports[i];
       if( (port.dir in letout) && port.name === key ) {
 
-        let rawValue = node.args[port.name];
+        const rawValue = node.args[port.name];
 
         const gotBack = result;
 
@@ -325,7 +325,7 @@ class AsyncBehaviorTree {
       return false;
     }
 
-    let found = this.functionDescriptions[n];
+    const found = this.functionDescriptions[n];
 
     let result;
     let useInArgsMode = false;
