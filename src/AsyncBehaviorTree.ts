@@ -456,6 +456,7 @@ class AsyncBehaviorTree {
     while( (ptr > 0) || (ptr > -1 && pending[ptr].length) || collection.length) {
       // debugger;
 
+      // istanbul ignore if
       if( this.destroyed ) {
         return;
       }
