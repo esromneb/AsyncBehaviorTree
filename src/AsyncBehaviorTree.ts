@@ -10,6 +10,22 @@ export interface IExecuteTree {
   seq?: any[];
   name?: string;
   args?: IExecuteTreeArgs;
+  uid?: number;
+}
+
+
+export interface ABTLogger {
+  start(): Promise<void>;
+  reset(): void;
+  setFilePath(path: string): Promise<void>;
+  parseXML(xml: string): void;
+  registerActionNodes(ns: string[]): void;
+  registerConditionNodes(ns: string[]): void;
+  logTransition(uid: number, prev_status: number, status: number): void;
+  logTransitionDuration(uid: number, prev_status: number, status: number, duration_ms: number): void;
+  getNameForUID(u: number): string;
+  getForPath(path: string): number;
+  getForPathArray(ps: number[]): number;
 }
 
 
@@ -40,6 +56,8 @@ class AsyncBehaviorTree {
     'forcesuccess':true,
   };
 
+  rawXml: string;
+
   constructor(xml: string, public bb: any, public warningCb?: {(m: string): void}) {
     const opts = {
       explicitChildren: true,
@@ -52,6 +70,7 @@ class AsyncBehaviorTree {
 
     let parser = new xml2js.Parser(opts);
 
+    this.rawXml = xml;
     parser.parseString(xml, this.parseResults.bind(this));
   }
 
@@ -661,6 +680,7 @@ class AsyncBehaviorTree {
         }
       }
     } // while(...)
+    return;
   } // walkTree
 
 
@@ -1001,6 +1021,66 @@ class AsyncBehaviorTree {
     });
 
     return Array.from(s);
+  }
+
+  // transition logger
+  // not a text logger
+  logger: ABTLogger;
+
+  logPath: string;
+
+  async setFileLogger(l: ABTLogger, path: string): Promise<void> {
+    this.logger = l;
+
+    await this.logger.start();
+    await this.logger.setFilePath(path);
+    this.logPath = path;
+
+    this.logger.registerActionNodes(this.getActionNodes());
+    this.logger.registerConditionNodes(this.getConditionNodes());
+    this.logger.parseXML(this.rawXml);
+
+    this.writeNodeUID();
+
+
+  }
+
+  private writeNodeUID(): void {
+
+    this.walkTree(this.writeNodeUIDInternal.bind(this));
+
+  }
+
+  private writeNodeUIDInternal(node: any): void {
+
+    // use the path to lookup the uid of the node
+    const uid = this.logger.getForPath(node.path);
+
+    // "c" name aka the name that c++ got for this node
+    const cn = this.logger.getNameForUID(uid);
+
+    const cnlow = cn.toLowerCase();
+
+    if( cnlow in this.nestingTypes ) {
+      // if it's a nesting node, the name is the node type, so we can't check
+    } else if( cn === node.name ) {
+      // everything is ok
+    } else {
+      throw new Error(`Error for path ${node.path}, ${cn} !== ${node.name}`);
+    }
+
+    // for "reasons" the node passed to this function is a copy, not the actual node
+    //
+
+    // this is the real node
+    const real = this.accessNodeByPath(node.path);
+
+    // write the uid from c to the real node
+    real.uid = uid;
+
+    // console.log(`${node.path}: ${uid} (${cn})`);
+
+  //     getNameForUID(u: number): string;
   }
 
 }

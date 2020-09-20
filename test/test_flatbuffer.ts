@@ -13,6 +13,7 @@ BehaviorTreeFlatBuffer
 
 const testTree3a = require("./btrees/testTree3a.xml");
 const testTree5 = require("./btrees/testTree5.xml");
+const testTree5a = require("./btrees/testTree5a.xml");
 const testTree7 = require("./btrees/testTree7.xml");
 const testTree13 = require("./btrees/testTree13.xml");
 const testTree14 = require("./btrees/testTree14.xml");
@@ -73,16 +74,17 @@ function injectAD(dut, id, p: string, n: string): void {
 let fail = {};
 let blackBoard: any = {
   called: [],
-  go1:   ()=>{blackBoard.called.push('go1');   return 'go1'   in fail ? false : true},
-  go2:   ()=>{blackBoard.called.push('go2');   return 'go2'   in fail ? false : true},
-  go3:   ()=>{blackBoard.called.push('go3');   return 'go3'   in fail ? false : true},
-  go4:   ()=>{blackBoard.called.push('go4');   return 'go4'   in fail ? false : true},
-  go5:   ()=>{blackBoard.called.push('go5');   return 'go5'   in fail ? false : true},
-  go6:   ()=>{blackBoard.called.push('go6');   return 'go6'   in fail ? false : true},
-  go7:   ()=>{blackBoard.called.push('go7');   return 'go7'   in fail ? false : true},
-  go8:   ()=>{blackBoard.called.push('go8');   return 'go8'   in fail ? false : true},
-  stay1: ()=>{blackBoard.called.push('stay1'); return 'stay1' in fail ? false : true},
-  stay2: ()=>{blackBoard.called.push('stay2'); return 'stay2' in fail ? false : true},
+  go1:    ()=>{blackBoard.called.push('go1');     return 'go1'    in fail ? false : true},
+  go2:    ()=>{blackBoard.called.push('go2');     return 'go2'    in fail ? false : true},
+  go3:    ()=>{blackBoard.called.push('go3');     return 'go3'    in fail ? false : true},
+  go4:    ()=>{blackBoard.called.push('go4');     return 'go4'    in fail ? false : true},
+  go5:    ()=>{blackBoard.called.push('go5');     return 'go5'    in fail ? false : true},
+  go6:    ()=>{blackBoard.called.push('go6');     return 'go6'    in fail ? false : true},
+  go7:    ()=>{blackBoard.called.push('go7');     return 'go7'    in fail ? false : true},
+  go8:    ()=>{blackBoard.called.push('go8');     return 'go8'    in fail ? false : true},
+  stay1:  ()=>{blackBoard.called.push('stay1');   return 'stay1'  in fail ? false : true},
+  stay2:  ()=>{blackBoard.called.push('stay2');   return 'stay2'  in fail ? false : true},
+  cIName: ()=>{blackBoard.called.push('cIName');  return 'cIName' in fail ? false : true},
   isFull: true,
 }
 
@@ -357,7 +359,7 @@ test.skip("test wasm", async function(done) {
 
 
 
-test("test getActionNodes getConditionNodes", async function(done) {
+test.skip("test getActionNodes getConditionNodes", async function(done) {
 
   {
     let dut = new AsyncBehaviorTree(testTree5, blackBoard);
@@ -394,31 +396,13 @@ test("test getActionNodes getConditionNodes", async function(done) {
 
 
 
+const util = require('util')
 
 
-test.skip("test some integration", async function(done) {
 
-  if( false ) {
-    await btfb.setFilePath('./node5.fbl');
+test("test some integration", async function(done) {
 
-    const actionNodes = [
-      'go1',
-      'go2',
-      'go3',
-      'stay1',
-      'stay2',
-    ];
-
-    btfb.registerActionNodes(actionNodes);
-
-    btfb.parseXML(testTree5);
-
-
-    console.log(btfb.treeNodeIds);
-    console.log(btfb.children);
-  }
-
-
+  const logpath = './node5a.fbl';
 
 
 
@@ -427,28 +411,21 @@ test.skip("test some integration", async function(done) {
 
   // const expected = ['go1'];
 
-  let dut = this.bt = new AsyncBehaviorTree(testTree5, blackBoard);
+  let dut = new AsyncBehaviorTree(testTree5a, blackBoard);
 
-  // dut.printCall = true;
+  await dut.setFileLogger(btfb, logpath);
+
+  dut.printCall = true;
 
   // console.log(dut.exe);
 
-  // console.log("\n\n");
-
-  let action = dut.getActionNodes().sort();
-  console.log(action);
-
-  let condition = dut.getConditionNodes();
-  console.log(condition);
-
-  // dut.walkTree((node)=>{
-  //   console.log(node);
-
-  // });
+  // console.log(util.inspect(dut.exe, {showHidden: false, depth: null}))
 
 
-  // reset();
-  // await dut.execute();
+
+  fail = []
+  reset();
+  await dut.execute();
   // expect(blackBoard.called).toStrictEqual(expected);
 
   // reset();
@@ -471,8 +448,6 @@ test.skip("test some integration", async function(done) {
     // injectAD(btfb, 7, 'idle', 'running');
 
 
-
-  done();
 });
 
 
