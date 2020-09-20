@@ -12,6 +12,8 @@ BehaviorTreeFlatBuffer
 } from "behavior-tree-flat-buffer";
 
 const testTree3a = require("./btrees/testTree3a.xml");
+const testTree5 = require("./btrees/testTree5.xml");
+const testTree7 = require("./btrees/testTree7.xml");
 const testTree13 = require("./btrees/testTree13.xml");
 const testTree14 = require("./btrees/testTree14.xml");
 const testTree14a = require("./btrees/testTree14a.xml");
@@ -274,7 +276,7 @@ function inject(dut, id, p: string, n: string): void {
 
 
 
-test("test wasm", async function(done) {
+test.skip("test wasm", async function(done) {
 
   if( true ) {
     await btfb.setFilePath('./node3.fbl');
@@ -344,8 +346,143 @@ test("test wasm", async function(done) {
 
 
 
+  // done();
+});
+
+
+
+
+
+
+
+
+
+test("test getActionNodes getConditionNodes", async function(done) {
+
+  {
+    let dut = new AsyncBehaviorTree(testTree5, blackBoard);
+
+    let action = dut.getActionNodes().sort();
+    expect(action).toEqual(['go1', 'go2', 'go3', 'stay1', 'stay2']);
+
+    // console.log(action);
+
+    let condition = dut.getConditionNodes().sort();
+    expect(condition).toEqual([]);
+    // console.log(condition);
+  }
+
+
+  {
+    let dut = new AsyncBehaviorTree(testTree7, blackBoard);
+
+    let action = dut.getActionNodes().sort();
+    expect(action).toEqual(['goClosestR', 'waitFrames']);
+
+    // console.log(action);
+
+    let condition = dut.getConditionNodes().sort();
+    expect(condition).toEqual(['isFull']);
+    // console.log(condition);
+  }
+
+
+
+  done();
+
+});
+
+
+
+
+
+test.skip("test some integration", async function(done) {
+
+  if( false ) {
+    await btfb.setFilePath('./node5.fbl');
+
+    const actionNodes = [
+      'go1',
+      'go2',
+      'go3',
+      'stay1',
+      'stay2',
+    ];
+
+    btfb.registerActionNodes(actionNodes);
+
+    btfb.parseXML(testTree5);
+
+
+    console.log(btfb.treeNodeIds);
+    console.log(btfb.children);
+  }
+
+
+
+
+
+
+  let print: boolean = false;
+
+  // const expected = ['go1'];
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree5, blackBoard);
+
+  // dut.printCall = true;
+
+  // console.log(dut.exe);
+
+  // console.log("\n\n");
+
+  let action = dut.getActionNodes().sort();
+  console.log(action);
+
+  let condition = dut.getConditionNodes();
+  console.log(condition);
+
+  // dut.walkTree((node)=>{
+  //   console.log(node);
+
+  // });
+
+
+  // reset();
+  // await dut.execute();
+  // expect(blackBoard.called).toStrictEqual(expected);
+
+  // reset();
+  // blackBoard.isFull = false;
+  // await dut.execute();
+  // expect(blackBoard.called).toStrictEqual([]);
+
+
+  done();
+
+
+
+    // injectAD(btfb, 1, 'idle', 'running');
+    // injectAD(btfb, 2, 'idle', 'running');
+    // injectAD(btfb, 3, 'idle', 'running');
+    // injectAD(btfb, 4, 'idle', 'failure');
+    // injectAD(btfb, 4, 'failure', 'idle');
+    // injectAD(btfb, 3, 'running', 'failure');
+    // injectAD(btfb, 6, 'idle', 'running');
+    // injectAD(btfb, 7, 'idle', 'running');
+
+
+
   done();
 });
+
+
+
+
+
+
+
+
+
 
 
 test.skip("test args", async function(done) {

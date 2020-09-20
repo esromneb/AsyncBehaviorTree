@@ -977,6 +977,31 @@ class AsyncBehaviorTree {
 
   }
 
+  getActionNodes(): string[] {
+
+    const s: Set<string> = new Set();
+
+    this.walkTree((node)=>{
+      if( node.w === 'action' ) {
+        s.add(node.name);
+      }
+    });
+
+    return Array.from(s);
+  }
+
+  getConditionNodes(): string[] {
+
+    const s: Set<string> = new Set();
+
+    this.walkTree((node)=>{
+      if( node.w === 'condition' ) {
+        s.add(node.name);
+      }
+    });
+
+    return Array.from(s);
+  }
 
 }
 
