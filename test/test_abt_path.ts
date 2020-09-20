@@ -5,16 +5,35 @@ import {
 AsyncBehaviorTree
 } from "../src/AsyncBehaviorTree";
 
-const testTree3a = require("./btrees/testTree3a.xml");
-const testTree4  = require("./btrees/testTree4.xml");
-const testTree5  = require("./btrees/testTree5.xml");
-const testTree9  = require("./btrees/testTree9.xml");
-const testTree10 = require("./btrees/testTree10.xml");
-const testTree11 = require("./btrees/testTree11.xml");
-const testTree12 = require("./btrees/testTree12.xml");
-const testTree14 = require("./btrees/testTree14.xml");
-const ud1        = require("./btrees/undefinedNode1.xml");
-
+const testDeep1 = require('./btrees/testDeep1.xml')
+const testDeep2 = require('./btrees/testDeep2.xml')
+const testTree10 = require('./btrees/testTree10.xml')
+const testTree11 = require('./btrees/testTree11.xml')
+const testTree12 = require('./btrees/testTree12.xml')
+const testTree13 = require('./btrees/testTree13.xml')
+const testTree14a = require('./btrees/testTree14a.xml')
+const testTree14b = require('./btrees/testTree14b.xml')
+const testTree14 = require('./btrees/testTree14.xml')
+const testTree15 = require('./btrees/testTree15.xml')
+const testTree16a = require('./btrees/testTree16a.xml')
+const testTree16_default = require('./btrees/testTree16_default.xml')
+const testTree16 = require('./btrees/testTree16.xml')
+const testTree1 = require('./btrees/testTree1.xml')
+const testTree2 = require('./btrees/testTree2.xml')
+const testTree3a = require('./btrees/testTree3a.xml')
+const testTree3 = require('./btrees/testTree3.xml')
+const testTree4 = require('./btrees/testTree4.xml')
+const testTree5 = require('./btrees/testTree5.xml')
+const testTree6 = require('./btrees/testTree6.xml')
+const testTree7 = require('./btrees/testTree7.xml')
+const testTree8 = require('./btrees/testTree8.xml')
+const testTree9 = require('./btrees/testTree9.xml')
+const undefinedNode1 = require('./btrees/undefinedNode1.xml')
+const undefinedNode2a = require('./btrees/undefinedNode2a.xml')
+const undefinedNode2 = require('./btrees/undefinedNode2.xml')
+const undefinedNode3a = require('./btrees/undefinedNode3a.xml')
+const undefinedNode3 = require('./btrees/undefinedNode3.xml')
+const undefinedNode4 = require('./btrees/undefinedNode4.xml')
 
 
 let fail = {};
@@ -71,7 +90,7 @@ test.skip("test path access correct", async function(done) {
     const ps = path.split('.').map(x=>parseInt(x,10));
 
     // fetch the node
-    const got = dut.accessNodeByPath(ps);
+    const got = dut.accessNodeByPathArray(ps);
 
     // loop through expected properties (w or name)
     for(const ep in e) {
@@ -87,7 +106,7 @@ test.skip("test path access correct", async function(done) {
 
 
 
-test("test path access and path correct", async function(done) {
+test.skip("test path access and path correct absolute", async function(done) {
 
   const expected = {
     '0':       {w:'sequence'},
@@ -100,7 +119,7 @@ test("test path access and path correct", async function(done) {
     
   };
 
-  let dut = this.bt = new AsyncBehaviorTree(ud1, blackBoard);
+  let dut = this.bt = new AsyncBehaviorTree(undefinedNode1, blackBoard);
 
   // loop through each expected
   for(const path in expected) {
@@ -109,7 +128,7 @@ test("test path access and path correct", async function(done) {
     const ps = path.split('.').map(x=>parseInt(x,10));
 
     // fetch the node
-    const got = dut.accessNodeByPath(ps);
+    const got = dut.accessNodeByPathArray(ps);
 
     // console.log(path, got);
     // loop through expected properties (w or name)
@@ -122,6 +141,64 @@ test("test path access and path correct", async function(done) {
       // assert that the node I got has the correct path
       expect(got.path).toBe(path);
     }
+  }
+
+  done();
+});
+
+test("test path access and path correct automatically", async function(done) {
+
+
+
+  const trees = [
+testDeep1,
+testDeep2,
+testTree10,
+testTree11,
+testTree12,
+testTree13,
+testTree14a,
+testTree14b,
+testTree14,
+testTree15,
+testTree16a,
+testTree16_default,
+testTree16,
+testTree1,
+testTree2,
+testTree3a,
+testTree3,
+testTree4,
+testTree5,
+testTree6,
+testTree7,
+testTree8,
+testTree9,
+undefinedNode1,
+undefinedNode2a,
+undefinedNode2,
+undefinedNode3a,
+undefinedNode3,
+undefinedNode4,
+  ];
+
+  for(const tree of trees) {
+    let dut = this.bt = new AsyncBehaviorTree(tree, blackBoard);
+
+
+    dut.walkTree((node)=>{
+
+      // fixme to node once I'm certain it's done
+      const got = dut.accessNodeByPath(node.path2);
+      // console.log(`${node.path}: `, node, got);
+
+      expect(got.name).toBe(node.name);
+      expect(got.w).toBe(node.w);
+      expect(got.path).toBe(node.path);
+      expect(got.path2).toBe(node.path2);
+      expect(got.path).toBe(node.path2);
+
+    });
   }
 
   done();
@@ -194,7 +271,7 @@ test.skip("path2 v path is correct", async function(done) {
   // testTree11,
   // testTree12,
   // testTree14,
-  ud1
+  undefinedNode1
   ];
 
   for(const tree of trees) {

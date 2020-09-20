@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <Fallback>
+                <Sequence>
+                    <Sequence>
+                        <Sequence>
+                            <Fallback>
+                                <Sequence>
+                                    <Sequence>
+                                        <Sequence>
+                                            <Sequence>
+                                                <Fallback>
+                                                    <Fallback>
+                                                        <Action ID="go4"/>
+                                                    </Fallback>
+                                                </Fallback>
+                                            </Sequence>
+                                        </Sequence>
+                                    </Sequence>
+                                </Sequence>
+                            </Fallback>
+                        </Sequence>
+                    </Sequence>
+                </Sequence>
+            </Fallback>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="go1"/>
+        <Action ID="go2"/>
+        <Action ID="go3"/>
+        <Action ID="go4"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

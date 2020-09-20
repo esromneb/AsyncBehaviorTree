@@ -573,7 +573,7 @@ class AsyncBehaviorTree {
   } // execute
 
 
-  async walkTree(cb: any): Promise<void> {
+  walkTree(cb: any): Promise<void> {
 
     // istanbul ignore if
     if( this.destroyed ) {
@@ -664,8 +664,13 @@ class AsyncBehaviorTree {
   } // walkTree
 
 
+  accessNodeByPath(path: string): any {
+    const ps = path.split('.').map(x=>parseInt(x,10));
+    return this.accessNodeByPathArray(ps);
+  }
+
   // pass a path as an array
-  accessNodeByPath(ps: number[]): any {
+  accessNodeByPathArray(ps: number[]): any {
 
     let exe: any = this.exe;
 
@@ -689,7 +694,7 @@ class AsyncBehaviorTree {
     // for "reasons" node is a copy of
     // the original
     let cb = (node, ps) => {
-      let original = this.accessNodeByPath(ps);
+      let original = this.accessNodeByPathArray(ps);
       original.path = ps.join('.');
     }
 
@@ -820,20 +825,9 @@ class AsyncBehaviorTree {
 
     let ps = pss.map(x=>parseInt(x,10));
 
-    console.log('loading', type, ps, node);
+    let slc = ps.slice(0,j);
 
-    if( type === 'fallback' ) {
-      debugger;
-    }
-
-    // for whatever reason, path in loadPath
-    // is either 1 or 2 deeper than we want
-    if( type in this.nestingTypes ) {
-      ps.pop();
-    }
-    ps.pop();
-
-    node.path2 = ps.join('.');
+    node.path2 = slc.join('.');
   }
 
 
@@ -891,11 +885,11 @@ class AsyncBehaviorTree {
         }
 
         exe[i] = {w:type,name:x,args};
-        this.writePathToNode(exe[i], type, ps);
+        this.writePathToNode(exe[i], type, ps, j);
 
       } else if( type === 'condition' ) {
         exe[i] = {w:type,name:x};
-        this.writePathToNode(exe[i], type, ps);
+        this.writePathToNode(exe[i], type, ps, j);
       } else {
         // istanbul ignore next
         throw new Error(`loadPath()[3] Unknown type: ${type}`);
