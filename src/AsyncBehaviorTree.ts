@@ -690,7 +690,7 @@ class AsyncBehaviorTree {
     // the original
     let cb = (node, ps) => {
       let original = this.accessNodeByPath(ps);
-      original.path = ps;
+      original.path = ps.join('.');
     }
 
     this.writePathToNodesInternal(cb);
@@ -814,8 +814,27 @@ class AsyncBehaviorTree {
 
 
 
+  // ps is a string here (annoying)
+  // called by loadPath
+  private writePathToNode(node, type, pss, j): void {
 
+    let ps = pss.map(x=>parseInt(x,10));
 
+    console.log('loading', type, ps, node);
+
+    if( type === 'fallback' ) {
+      debugger;
+    }
+
+    // for whatever reason, path in loadPath
+    // is either 1 or 2 deeper than we want
+    if( type in this.nestingTypes ) {
+      ps.pop();
+    }
+    ps.pop();
+
+    node.path2 = ps.join('.');
+  }
 
 
 // type: sequence path: 0.0. x: go1
@@ -854,9 +873,12 @@ class AsyncBehaviorTree {
 
       const type = hs[j];
 
+      // console.log(hs);
+
       if( type in nesting ) {
         if( exe[i] == undefined ) {
           exe[i] = {w:type,seq:[]};
+          this.writePathToNode(exe[i], type, ps, j);
         }
       } else if( type === 'action' ) {
 
@@ -869,9 +891,11 @@ class AsyncBehaviorTree {
         }
 
         exe[i] = {w:type,name:x,args};
+        this.writePathToNode(exe[i], type, ps);
 
       } else if( type === 'condition' ) {
         exe[i] = {w:type,name:x};
+        this.writePathToNode(exe[i], type, ps);
       } else {
         // istanbul ignore next
         throw new Error(`loadPath()[3] Unknown type: ${type}`);
@@ -929,6 +953,7 @@ class AsyncBehaviorTree {
 
     this.recurse(f, 0, "0.", "root.");
 
+    // not used anymore
     this.writePathToNodes();
 
     // istanbul ignore if
@@ -959,9 +984,6 @@ class AsyncBehaviorTree {
       // debugger;
       for(let i = 0; i < children.length; i++) {
 
-        
-        // not sure how or why, but the path here is wrong
-        // see writePathToNodes()
         const pp = path+i+'.';
         // console.log("calling with path: "+ pp);
 
