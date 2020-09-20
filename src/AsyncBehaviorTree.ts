@@ -573,8 +573,6 @@ class AsyncBehaviorTree {
   } // execute
 
 
-
-
   async walkTree(cb: any): Promise<void> {
 
     // istanbul ignore if
@@ -634,16 +632,7 @@ class AsyncBehaviorTree {
         cb(node);
 
         pending[ptr].unshift(...node.seq);
-
-        // istanbul ignore if
-        // if( this.printCall ) {
-          // console.log(`nesting ${node.w}`);
-        // }
       } else if (node.w === 'action') {
-
-        // console.log('visit action ', node);
-
-        // let res = await this.callAction(node);
 
         // istanbul ignore if
         if( this.destroyed ) {
@@ -663,39 +652,129 @@ class AsyncBehaviorTree {
 
       // if we are empty we need to decide pop behavior
       while( (ptr > 0 && pending[ptr].length == 0) ) {
-        // debugger;
-        if( types[ptr] === 'fallback' ) {
-          // const anySaved = anypass[ptr];
+        
+        if( types[ptr] in nesting ) {
           popLevel();
-          // if( anySaved ) {
-          //   // we got at least 1 pass in our fallback, just move on
-          // } else {
-          //   // still want the pop, above, but now time to fail up to
-          //   // the next level
-          //   failUp();
-          // }
-        } else if( types[ptr] === 'inverter' ) {
-          // const anySaved = anypass[ptr];
-          popLevel();
-          // if( anySaved ) {
-          //   failUp();
-          // }
-        } else if( types[ptr] === 'sequence' || types[ptr] === 'forcesuccess' ) {
-          popLevel();
-          // we are popping a sequence if we get here the sequence succeded
-          // we must mark anypass as true for the new level for #35 (part 2)
-          // anypass[ptr] = true;
         } else {
           // istanbul ignore next
           throw new Error(`Unknown types in finish pending: ${types[ptr]}`);
         }
-        // break; // uncomment to cause issue #35
       }
     } // while(...)
-  } // execute
+  } // walkTree
 
 
 
+
+  // there is a path in dot notation that is used
+  // in the initial parse, however it's not globally correct
+  // this I need to re-visit all the nodes and grab the path
+  writePathToNodes(): void {
+
+    // istanbul ignore if
+    if( this.destroyed ) {
+      throw new Error("can't call execute() after AsyncBehaviorTree is destroyed");
+    }
+
+    let collection = merge([], this.exe);
+
+    const nesting = this.nestingTypes;
+
+    const pending: any[][] = [[]];
+    const types: string[] = [];
+    const anypass: boolean[] = [];
+    let ptr = -1;
+    let ps = [];  // path split into an array
+
+    const popLevel = (): void => {
+      pending.pop();
+      types.pop();
+      anypass.pop();
+      ptr--;
+
+      // pop off the path
+      ps.pop();
+      // increment after the pop
+      ps[ps.length-1]++;
+    }
+
+    
+    while( (ptr > 0) || (ptr > -1 && pending[ptr].length) || collection.length) {
+      // debugger;
+
+      // istanbul ignore if
+      if( this.destroyed ) {
+        return;
+      }
+
+      let node;
+      if( ptr > -1 && pending[ptr].length ) {
+        node = pending[ptr].shift();
+
+      } else {
+        node = collection.shift();
+        ps.push(0);
+      }
+
+      // istanbul ignore if
+      if(node == undefined) {
+        throw new Error(`node cannot be undefined here`);
+      }
+
+      if( node.w in nesting ) {
+        ptr++;
+
+        // istanbul ignore if
+        if( pending[ptr] && pending[ptr].length ) {
+          throw new Error(`pending[ptr] cannot have nodes at creation`);
+        }
+
+        pending[ptr] = [];
+        types  [ptr] = node.w;
+        anypass[ptr] = false;
+
+        // cb(node, ps);
+        node.path = ps.join('.');
+
+        pending[ptr].unshift(...node.seq);
+        ps.push(0);
+      } else if (node.w === 'action') {
+
+        // istanbul ignore if
+        if( this.destroyed ) {
+          return;
+        }
+
+        // cb(node, ps);
+        node.path = ps.join('.');
+
+      } else if (node.w === 'condition') {
+
+        // cb(node, ps);
+        node.path = ps.join('.');
+
+      } else {
+        // istanbul ignore next
+        throw new Error(`Unknown walk type: ${node.w}`);
+      }
+
+      if( !(node.w in nesting) ) {
+        // increment the value in the most recent path
+        ps[ps.length-1]++;
+      }
+
+      // if we are empty we need to decide pop behavior
+      while( (ptr > 0 && pending[ptr].length == 0) ) {
+
+        if( types[ptr] in nesting ) {
+          popLevel();
+        } else {
+          // istanbul ignore next
+          throw new Error(`Unknown types in finish pending: ${types[ptr]}`);
+        }
+      }
+    } // while(...)
+  } // writePathToNodes
 
 
 
@@ -765,8 +844,9 @@ class AsyncBehaviorTree {
         throw new Error(`loadPath()[3] Unknown type: ${type}`);
       }
 
+      // confusing but this is
+      // how we nest down and then loop
       if( type in nesting ) {
-        // console.log('fixme');
         exe = exe[i].seq;
       } else if( type === 'action' ) {
         exe = exe[i]
@@ -816,6 +896,8 @@ class AsyncBehaviorTree {
 
     this.recurse(f, 0, "0.", "root.");
 
+    this.writePathToNodes();
+
     // istanbul ignore if
     if( this.printParse ) {
       console.log(JSON.stringify(this.exe));
@@ -845,7 +927,8 @@ class AsyncBehaviorTree {
       for(let i = 0; i < children.length; i++) {
 
         
-
+        // not sure how or why, but the path here is wrong
+        // see writePathToNodes()
         const pp = path+i+'.';
         // console.log("calling with path: "+ pp);
 
