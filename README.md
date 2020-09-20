@@ -16,4 +16,9 @@ Functions can be called with normal arguments. To do this name the inputs like `
 # Internals
 `exe` is a member which has the tree.  Each tree node can have a member called `seq` which is an array of children.  Each tree node has a member called `path` which is a dot notation of numbers.  `path` skips the root node, however in most (all?) trees the first node is a nesting type (sqeuence, fallback, invert) etc.  Thus the first element of the path will always be `0`.
 
+
+# Log Details
+If a fallback has 2 failures and a success under it. The nodes will stay marked as such.  Once the final fallback has completed. The log will "go back" and mark the nodes from "failure" to "idle". The success will be marked from "success" to "idle".  This "dims" the entire subtree.  Then the Fallback will be marked success.  I don't copy this behavior very well atm.
+
+
 # Rules
