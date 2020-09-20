@@ -189,14 +189,14 @@ undefinedNode4,
     dut.walkTree((node)=>{
 
       // fixme to node once I'm certain it's done
-      const got = dut.accessNodeByPath(node.path2);
+      const got = dut.accessNodeByPath(node.path);
       // console.log(`${node.path}: `, node, got);
 
       expect(got.name).toBe(node.name);
       expect(got.w).toBe(node.w);
       expect(got.path).toBe(node.path);
-      expect(got.path2).toBe(node.path2);
-      expect(got.path).toBe(node.path2);
+      // expect(got.path2).toBe(node.path2);
+      // expect(got.path).toBe(node.path2);
 
     });
   }
