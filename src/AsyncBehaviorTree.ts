@@ -577,6 +577,7 @@ class AsyncBehaviorTree {
 
   async walkTree(cb: any): Promise<void> {
 
+    // istanbul ignore if
     if( this.destroyed ) {
       throw new Error("can't call execute() after AsyncBehaviorTree is destroyed");
     }
@@ -644,33 +645,16 @@ class AsyncBehaviorTree {
 
         // let res = await this.callAction(node);
 
+        // istanbul ignore if
         if( this.destroyed ) {
           return;
         }
 
         cb(node);
 
-
-
-        // if( res ) {
-        //   anypass[ptr] = true;
-        // }
-
-        // if(!res) {
-        //   failUp();
-        // }
-
-
-
       } else if (node.w === 'condition') {
 
         cb(node);
-        
-        // let res = this.evaluateCondition(node.name);
-
-
-        // console.log("visit condition", node);
-
 
       } else {
         // istanbul ignore next
@@ -728,7 +712,7 @@ class AsyncBehaviorTree {
 
   loadPath(_path, hierarchy: string, x: string, props: any): void {
 
-    const exe: IExecuteTree[] = this.exe;
+    let exe: any = this.exe;
 
     const ps = _path.split('.');
     const hs = hierarchy.split('.');
