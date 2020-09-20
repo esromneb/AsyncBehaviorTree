@@ -1,16 +1,29 @@
 var xml2js = require('xml2js');
 const merge = require('deepmerge');
 
+export interface IExecuteTreeArgs {
+  [name: string]: string;
+}
+
+export interface IExecuteTree {
+  w: string;
+  seq?: any[];
+  name?: string;
+  args?: IExecuteTreeArgs;
+}
+
 
 class AsyncBehaviorTree {
 
   p: any;
 
-  exe: any = [];
+  exe: IExecuteTree[] = [];
 
   printParse: boolean = false;
   printCall: boolean = false;
   printWarnings: boolean = true;
+  logRecurse: boolean = true;
+  logLoadPath: boolean = true;
   warnUndefinedReturn: boolean = true;
   warnWhenCreatingNewObjects: boolean = false;
   warnWhenOutputNotFilled: boolean = false;
@@ -42,14 +55,14 @@ class AsyncBehaviorTree {
     parser.parseString(xml, this.parseResults.bind(this));
   }
 
-  destroy() {
+  destroy(): void {
     this.destroyed = true;
     this.p = null;
     this.exe = null;
   }
 
   // istanbul ignore next
-  warning(t: string) {
+  warning(t: string): void {
     this.warningCb(t);
   }
 
@@ -563,9 +576,9 @@ class AsyncBehaviorTree {
 // type: sequence path: 0.1.0. x: stay1
 // type: sequence path: 0.2. x: go2
 
-  loadPath(_path, hierarchy: string, x: string, props: any) {
+  loadPath(_path, hierarchy: string, x: string, props: any): void {
 
-    const exe = this.exe;
+    const exe: IExecuteTree[] = this.exe;
 
     const ps = _path.split('.');
     const hs = hierarchy.split('.');
@@ -576,15 +589,14 @@ class AsyncBehaviorTree {
       throw new Error('illegal lengths passed to loadPath()');
     }
 
-
-    let unpack = exe;
-
     // istanbul ignore if
-    if( this.printParse ) {
+    if( this.printParse || this.logLoadPath ) {
       console.log(`path: ${_path} fn: ${x} h: ${hierarchy}`);
     }
 
-
+    // loop through the parts of the path
+    // j is index
+    // i is the literal number
     for(let j = 1; j < ps.length; j++) {
 
 
@@ -597,8 +609,8 @@ class AsyncBehaviorTree {
       const type = hs[j];
 
       if( type in nesting ) {
-        if( unpack[i] == undefined ) {
-          unpack[i] = {w:type,seq:[]};
+        if( exe[i] == undefined ) {
+          exe[i] = {w:type,seq:[]};
         }
       } else if( type === 'action' ) {
 
@@ -610,10 +622,10 @@ class AsyncBehaviorTree {
           args[a] = props[a];
         }
 
-        unpack[i] = {w:type,name:x,args};
+        exe[i] = {w:type,name:x,args};
 
       } else if( type === 'condition' ) {
-        unpack[i] = {w:type,name:x};
+        exe[i] = {w:type,name:x};
       } else {
         // istanbul ignore next
         throw new Error(`loadPath()[3] Unknown type: ${type}`);
@@ -621,9 +633,9 @@ class AsyncBehaviorTree {
 
       if( type in nesting ) {
         // console.log('fixme');
-        unpack = unpack[i].seq;
+        exe = exe[i].seq;
       } else if( type === 'action' ) {
-        unpack = unpack[i]
+        exe = exe[i]
       }
 
 
@@ -677,10 +689,14 @@ class AsyncBehaviorTree {
     }
   }
 
-  recurse(t: any, depth: number, path: string, hierarchy: string) {
+  recurse(t: any, depth: number, path: string, hierarchy: string): void {
     // if(depth === 0) {
     //   debugger;
     // }
+
+    if(this.logRecurse) {
+      console.log(`Depth ${depth}, path ${path}, hier ${hierarchy}`);
+    }
 
     const props = t['$'];
     const children = t['$$'];
