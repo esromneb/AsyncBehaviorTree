@@ -461,7 +461,7 @@ class AsyncBehaviorTree {
     const anypass: boolean[] = [];
     let ptr = -1;
 
-    const popLevel = (): void => {
+    const popLevel = (success: boolean): void => {
       pending.pop();
       types.pop();
       anypass.pop();
@@ -473,7 +473,7 @@ class AsyncBehaviorTree {
 
         // fail all the way up
         if( types[ptr] === 'sequence' ) {
-          popLevel();
+          popLevel(false);
         } else if( types[ptr] === 'fallback' || types[ptr] === 'inverter' || types[ptr] === 'forcesuccess' ) {
           // do nothing, see logic below
           break;
@@ -519,17 +519,21 @@ class AsyncBehaviorTree {
 
         pending[ptr].unshift(...node.seq);
 
+        this.logTransition(node, false);
+
         // istanbul ignore if
         if( this.printCall ) {
           console.log(`nesting ${node.w}`);
         }
       } else if (node.w === 'action') {
 
-        let res = await this.callAction(node);
+        const res = await this.callAction(node);
 
         if( this.destroyed ) {
           return;
         }
+
+        this.logTransition(node, false, res);
 
         if( res ) {
           anypass[ptr] = true;
@@ -542,7 +546,9 @@ class AsyncBehaviorTree {
 
 
       } else if (node.w === 'condition') {
-        let res = this.evaluateCondition(node.name);
+        const res = this.evaluateCondition(node.name);
+
+        this.logTransition(node, false, res);
 
         if( res ) {
           anypass[ptr] = true;
@@ -563,22 +569,27 @@ class AsyncBehaviorTree {
         // debugger;
         if( types[ptr] === 'fallback' ) {
           const anySaved = anypass[ptr];
-          popLevel();
+          popLevel(true);
+          this.logTransition(node, true, true);
           if( anySaved ) {
             // we got at least 1 pass in our fallback, just move on
           } else {
             // still want the pop, above, but now time to fail up to
             // the next level
             failUp();
+            this.logTransition(node, true, false);
           }
         } else if( types[ptr] === 'inverter' ) {
           const anySaved = anypass[ptr];
-          popLevel();
+          popLevel(true);
+          this.logTransition(node, true, false);
           if( anySaved ) {
             failUp();
+            this.logTransition(node, true, false);
           }
         } else if( types[ptr] === 'sequence' || types[ptr] === 'forcesuccess' ) {
-          popLevel();
+          popLevel(true);
+          this.logTransition(node, true, true);
           // we are popping a sequence if we get here the sequence succeded
           // we must mark anypass as true for the new level for #35 (part 2)
           anypass[ptr] = true;
@@ -1081,6 +1092,35 @@ class AsyncBehaviorTree {
     // console.log(`${node.path}: ${uid} (${cn})`);
 
   //     getNameForUID(u: number): string;
+  }
+
+  //    idle: 0,
+  //    running: 1,
+  //    success: 2,
+  //    failure: 3
+
+  logPrevState: number = 0;
+
+  private logTransition(node: any, pop: boolean, result?: boolean): void {
+    if( !this.logger ) {
+      return;
+    }
+
+    const nest = (node.w in this.nestingTypes);
+
+    if( nest ) {
+      this.logger.logTransition(node.uid, 0, 1);
+    } else {
+
+      let cur = 3;
+
+      if( !!result ) {
+        cur = 2;
+      }
+
+      this.logger.logTransition(node.uid, 0, cur);
+    }
+
   }
 
 }

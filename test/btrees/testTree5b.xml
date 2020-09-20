@@ -4,16 +4,26 @@
     <BehaviorTree ID="BehaviorTree">
         <Sequence name="Sequence1">
             <Action ID="go1"/>
-            <Sequence name="Sequence2">
+            <Fallback>
                 <Action ID="stay1"/>
-                <Action ID="stay2"/>
-                <Sequence name="Sequence3">
+                <Sequence>
+                    <Action ID="go1"/>
+                    <Action ID="go5"/>
+                    <Sequence name="Sequence3">
+                        <Action ID="go1"/>
+                        <Action ID="go2"/>
+                        <Condition ID="isFull"/>
+                        <Action ID="go3"/>
+                    </Sequence>
+                </Sequence>
+                <Sequence>
+                    <Action ID="go6"/>
                     <Action ID="go1"/>
                     <Action ID="go2"/>
-                    <Condition ID="isFull"/>
                     <Action ID="go3"/>
                 </Sequence>
-            </Sequence>
+                <Action ID="stay2"/>
+            </Fallback>
             <Action ID="go2"/>
             <Action ID="go3"/>
             <Sequence name="Sequence4">
@@ -39,6 +49,8 @@
         <Action ID="go2"/>
         <Action ID="go3"/>
         <Action ID="go4"/>
+        <Action ID="go5"/>
+        <Action ID="go6"/>
         <Action ID="goClosestR"/>
         <Condition ID="isFull"/>
         <Action ID="mineResources"/>

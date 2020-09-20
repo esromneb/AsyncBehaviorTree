@@ -14,6 +14,7 @@ BehaviorTreeFlatBuffer
 const testTree3a = require("./btrees/testTree3a.xml");
 const testTree5 = require("./btrees/testTree5.xml");
 const testTree5a = require("./btrees/testTree5a.xml");
+const testTree5b = require("./btrees/testTree5b.xml");
 const testTree7 = require("./btrees/testTree7.xml");
 const testTree13 = require("./btrees/testTree13.xml");
 const testTree14 = require("./btrees/testTree14.xml");
@@ -402,7 +403,7 @@ const util = require('util')
 
 test("test some integration", async function(done) {
 
-  const logpath = './node5a.fbl';
+  const logpath = './node5b.fbl';
 
 
 
@@ -411,7 +412,7 @@ test("test some integration", async function(done) {
 
   // const expected = ['go1'];
 
-  let dut = new AsyncBehaviorTree(testTree5a, blackBoard);
+  let dut = new AsyncBehaviorTree(testTree5b, blackBoard);
 
   await dut.setFileLogger(btfb, logpath);
 
@@ -423,8 +424,12 @@ test("test some integration", async function(done) {
 
 
 
-  fail = []
   reset();
+
+  fail = []
+  blackBoard.isFull = false;
+
+
   await dut.execute();
   // expect(blackBoard.called).toStrictEqual(expected);
 
