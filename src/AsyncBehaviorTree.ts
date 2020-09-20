@@ -694,6 +694,14 @@ class AsyncBehaviorTree {
     return;
   } // walkTree
 
+  pathForArray(ps: number[]): string {
+    return ps.join('.');
+  }
+
+  arrayForPath(path: string): number[] {
+    const ps = path.split('.').map(x=>parseInt(x,10));
+    return ps;
+  }
 
   accessNodeByPath(path: string): any {
     const ps = path.split('.').map(x=>parseInt(x,10));
@@ -717,6 +725,27 @@ class AsyncBehaviorTree {
     }
 
     return exe;
+  }
+
+  // get the parent of a string path (as a string)
+  getPathParent(path: string): string | undefined {
+    let array = this.arrayForPath(path);
+    if( array.length <= 1 ) {
+      return undefined;
+    }
+
+    array.pop();
+
+    return this.pathForArray(array);
+  }
+
+  getNodeParent(node: any): any {
+    const parentPath = this.getPathParent(node.path);
+    if( parentPath == undefined ) {
+      return undefined;
+    }
+
+    return this.accessNodeByPath(parentPath);
   }
 
 

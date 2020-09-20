@@ -58,7 +58,7 @@ function reset() {
   blackBoard.isFull = true;
 }
 
-test.skip("test path access correct", async function(done) {
+test("test path access and parent correct", async function(done) {
 /*
 
 0      sequence
@@ -83,6 +83,9 @@ test.skip("test path access correct", async function(done) {
 
   let dut = this.bt = new AsyncBehaviorTree(testTree3a, blackBoard);
 
+
+
+
   // loop through each expected
   for(const path in expected) {
     const e = expected[path];
@@ -99,6 +102,22 @@ test.skip("test path access correct", async function(done) {
     }
   }
 
+  expect(dut.getPathParent('0.1.0')).toBe('0.1');
+  expect(dut.getPathParent('0.1')).toBe('0');
+  expect(dut.getPathParent('0')).toBe(undefined);
+  expect(dut.getPathParent('')).toBe(undefined);
+
+
+  let n0 = dut.accessNodeByPath('0.1.0');
+  let n1 = dut.accessNodeByPath('0.1.1');
+  
+  expect(dut.getNodeParent(n0).path).toBe('0.1');
+  expect(dut.getNodeParent(n0).w).toBe('sequence');
+
+  expect(dut.getNodeParent(n1).path).toBe('0.1');
+  expect(dut.getNodeParent(n1).w).toBe('sequence');
+
+
   done();
 });
 
@@ -106,7 +125,7 @@ test.skip("test path access correct", async function(done) {
 
 
 
-test.skip("test path access and path correct absolute", async function(done) {
+test("test path access and path correct absolute", async function(done) {
 
   const expected = {
     '0':       {w:'sequence'},
