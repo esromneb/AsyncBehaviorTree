@@ -22,8 +22,8 @@ class AsyncBehaviorTree {
   printParse: boolean = false;
   printCall: boolean = false;
   printWarnings: boolean = true;
-  logRecurse: boolean = true;
-  logLoadPath: boolean = true;
+  logRecurse: boolean = false;
+  logLoadPath: boolean = false;
   warnUndefinedReturn: boolean = true;
   warnWhenCreatingNewObjects: boolean = false;
   warnWhenOutputNotFilled: boolean = false;
@@ -664,12 +664,45 @@ class AsyncBehaviorTree {
   } // walkTree
 
 
+  // pass a path as an array
+  accessNodeByPath(ps: number[]): any {
+
+    let exe: any = this.exe;
+
+    for(let j = 0; j < ps.length; j++) {
+      const i = ps[j];
+        
+      if( 'seq' in exe ) {
+        exe = exe.seq[i]
+      } else {
+        exe = exe[i];
+      }
+
+    }
+
+    return exe;
+  }
+
+
+  writePathToNodes(): void {
+
+    // for "reasons" node is a copy of
+    // the original
+    let cb = (node, ps) => {
+      let original = this.accessNodeByPath(ps);
+      original.path = ps;
+    }
+
+    this.writePathToNodesInternal(cb);
+  }
 
 
   // there is a path in dot notation that is used
   // in the initial parse, however it's not globally correct
   // this I need to re-visit all the nodes and grab the path
-  writePathToNodes(): void {
+  writePathToNodesInternal(cb): void {
+
+    // debugger;
 
     // istanbul ignore if
     if( this.destroyed ) {
@@ -733,8 +766,8 @@ class AsyncBehaviorTree {
         types  [ptr] = node.w;
         anypass[ptr] = false;
 
-        // cb(node, ps);
-        node.path = ps.join('.');
+        cb(node, ps);
+        // node.path = ps.join('.');
 
         pending[ptr].unshift(...node.seq);
         ps.push(0);
@@ -745,13 +778,13 @@ class AsyncBehaviorTree {
           return;
         }
 
-        // cb(node, ps);
-        node.path = ps.join('.');
+        cb(node, ps);
+        // node.path = ps.join('.');
 
       } else if (node.w === 'condition') {
 
-        // cb(node, ps);
-        node.path = ps.join('.');
+        cb(node, ps);
+        // node.path = ps.join('.');
 
       } else {
         // istanbul ignore next

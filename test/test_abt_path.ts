@@ -30,13 +30,8 @@ function reset() {
   blackBoard.isFull = true;
 }
 
-
-
-test("test path is correct", async function(done) {
-
-
-  /*
-
+test("test path access correct", async function(done) {
+/*
 
 0      sequence
 0.0    go1
@@ -46,8 +41,54 @@ test("test path is correct", async function(done) {
 0.2    go2
 0.3    go3
 
+*/
 
-  */
+  const expected = {
+    '0':     {w:'sequence'},
+    '0.0':   {name:'go1'},
+    '0.1':   {w:'sequence'},
+    '0.1.0': {name:'stay1'},
+    '0.1.1': {name:'stay2'},
+    '0.2':   {name:'go2'},
+    '0.3':   {name:'go3'},
+  };
+
+  let dut = this.bt = new AsyncBehaviorTree(testTree3a, blackBoard);
+
+  // loop through each expected
+  for(const path in expected) {
+    const e = expected[path];
+    // split back to an array
+    const ps = path.split('.').map(x=>parseInt(x,10));
+
+    // fetch the node
+    const got = dut.accessNodeByPath(ps);
+
+    // loop through expected properties (w or name)
+    for(const ep in e) {
+      // assert that the got node matches what I expect
+      expect(got[ep]).toBe(e[ep]);
+    }
+  }
+
+  done();
+});
+
+
+
+test.skip("test path is correct", async function(done) {
+
+/*
+
+0      sequence
+0.0    go1
+0.1    sequence
+0.1.0  stay1
+0.1.1  stay2
+0.2    go2
+0.3    go3
+
+*/
 
   let print: boolean = false;
 
@@ -55,7 +96,7 @@ test("test path is correct", async function(done) {
 
   let dut = this.bt = new AsyncBehaviorTree(testTree3a, blackBoard);
 
-  dut.printCall = true;
+  // dut.printCall = true;
 
   // console.log(dut.exe);
 
@@ -66,10 +107,7 @@ test("test path is correct", async function(done) {
 
   dut.walkTree((node)=>{
     console.log(`${node.path}: ${node.name}`, node);
-
   });
-
-
 
 
   done();
