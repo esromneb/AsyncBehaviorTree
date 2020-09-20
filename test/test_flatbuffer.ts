@@ -25,6 +25,7 @@ const testTree16_default = require("./btrees/testTree16_default.xml");
 // global single instance of this
 let btfb;
 
+// can return a promise, but doesn't have to
 beforeAll(() => {
   btfb = new BehaviorTreeFlatBuffer();
 
