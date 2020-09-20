@@ -572,6 +572,156 @@ class AsyncBehaviorTree {
     } // while(...)
   } // execute
 
+
+
+
+  async walkTree(cb: any): Promise<void> {
+
+    if( this.destroyed ) {
+      throw new Error("can't call execute() after AsyncBehaviorTree is destroyed");
+    }
+
+    let collection = merge([], this.exe);
+
+    const nesting = this.nestingTypes;
+
+    const pending: any[][] = [[]];
+    const types: string[] = [];
+    const anypass: boolean[] = [];
+    let ptr = -1;
+
+    const popLevel = (): void => {
+      pending.pop();
+      types.pop();
+      anypass.pop();
+      ptr--;
+    }
+
+    
+    while( (ptr > 0) || (ptr > -1 && pending[ptr].length) || collection.length) {
+      // debugger;
+
+      // istanbul ignore if
+      if( this.destroyed ) {
+        return;
+      }
+
+      let node;
+      if( ptr > -1 && pending[ptr].length ) {
+        node = pending[ptr].shift();
+      } else {
+        node = collection.shift();
+      }
+
+      // istanbul ignore if
+      if(node == undefined) {
+        throw new Error(`node cannot be undefined here`);
+      }
+
+      if( node.w in nesting ) {
+        ptr++;
+
+        // istanbul ignore if
+        if( pending[ptr] && pending[ptr].length ) {
+          throw new Error(`pending[ptr] cannot have nodes at creation`);
+        }
+
+        pending[ptr] = [];
+        types  [ptr] = node.w;
+        anypass[ptr] = false;
+
+        cb(node);
+
+        pending[ptr].unshift(...node.seq);
+
+        // istanbul ignore if
+        // if( this.printCall ) {
+          // console.log(`nesting ${node.w}`);
+        // }
+      } else if (node.w === 'action') {
+
+        // console.log('visit action ', node);
+
+        // let res = await this.callAction(node);
+
+        if( this.destroyed ) {
+          return;
+        }
+
+        cb(node);
+
+
+
+        // if( res ) {
+        //   anypass[ptr] = true;
+        // }
+
+        // if(!res) {
+        //   failUp();
+        // }
+
+
+
+      } else if (node.w === 'condition') {
+
+        cb(node);
+        
+        // let res = this.evaluateCondition(node.name);
+
+
+        // console.log("visit condition", node);
+
+
+      } else {
+        // istanbul ignore next
+        throw new Error(`Unknown walk type: ${node.w}`);
+      }
+
+      // if we are empty we need to decide pop behavior
+      while( (ptr > 0 && pending[ptr].length == 0) ) {
+        // debugger;
+        if( types[ptr] === 'fallback' ) {
+          // const anySaved = anypass[ptr];
+          popLevel();
+          // if( anySaved ) {
+          //   // we got at least 1 pass in our fallback, just move on
+          // } else {
+          //   // still want the pop, above, but now time to fail up to
+          //   // the next level
+          //   failUp();
+          // }
+        } else if( types[ptr] === 'inverter' ) {
+          // const anySaved = anypass[ptr];
+          popLevel();
+          // if( anySaved ) {
+          //   failUp();
+          // }
+        } else if( types[ptr] === 'sequence' || types[ptr] === 'forcesuccess' ) {
+          popLevel();
+          // we are popping a sequence if we get here the sequence succeded
+          // we must mark anypass as true for the new level for #35 (part 2)
+          // anypass[ptr] = true;
+        } else {
+          // istanbul ignore next
+          throw new Error(`Unknown types in finish pending: ${types[ptr]}`);
+        }
+        // break; // uncomment to cause issue #35
+      }
+    } // while(...)
+  } // execute
+
+
+
+
+
+
+
+
+
+
+
+
+
 // type: sequence path: 0.0. x: go1
 // type: sequence path: 0.1.0. x: stay1
 // type: sequence path: 0.2. x: go2

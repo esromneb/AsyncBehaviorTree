@@ -275,23 +275,24 @@ function inject(dut, id, p: string, n: string): void {
 
 test("test wasm", async function(done) {
 
-  if( false ) {
+  if( true ) {
     await btfb.setFilePath('./node3.fbl');
 
     const actionNodes = [
-      'inOnlyA',
-      'inOnlyB',
-      'outOnlyA',
-      'outOnlyB',
-      'outOnlyC',
-      'outOnlyD',
-      'outOnlyE',
-      'outOnlyF',
+      'go1',
+      'go2',
+      'go3',
+      'stay1',
+      'stay2',
     ];
 
     btfb.registerActionNodes(actionNodes);
 
     btfb.parseXML(testTree3a);
+
+
+    console.log(btfb.treeNodeIds);
+    console.log(btfb.children);
   }
 
 
@@ -307,11 +308,18 @@ test("test wasm", async function(done) {
 
   dut.printCall = true;
 
-  console.log(dut.exe);
+  // console.log(dut.exe);
+
+  console.log("\n\n");
+
+  dut.walkTree((node)=>{
+    console.log(node);
+
+  });
 
 
-  reset();
-  await dut.execute();
+  // reset();
+  // await dut.execute();
   // expect(blackBoard.called).toStrictEqual(expected);
 
   // reset();
@@ -323,8 +331,6 @@ test("test wasm", async function(done) {
   done();
 
 
-    // console.log(btfb.treeNodeIds);
-    // console.log(btfb.children);
 
     // injectAD(btfb, 1, 'idle', 'running');
     // injectAD(btfb, 2, 'idle', 'running');
