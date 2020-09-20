@@ -12,4 +12,8 @@ By default, functions expect a single argument which is a object with keys.  The
 Functions can be called with normal arguments. To do this name the inputs like `_in_0` and `_in_1` in the Groot Action notes.
 
 
+
+# Internals
+`exe` is a member which has the tree.  Each tree node can have a member called `seq` which is an array of children.  Each tree node has a member called `path` which is a dot notation of numbers.  `path` skips the root node, however in most (all?) trees the first node is a nesting type (sqeuence, fallback, invert) etc.  Thus the first element of the path will always be `0`.
+
 # Rules
