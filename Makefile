@@ -20,7 +20,6 @@ jestw:
 	npm run jestw
 
 
-# clean:
-# 	rm -rf out/*
-# 	rm -rf dist/*
+clean:
+	npm run clean
 

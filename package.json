@@ -6,6 +6,9 @@
   "directories": {
     "doc": "docs"
   },
+  "files": [
+    "/dist"
+  ],
   "scripts": {
     "test": "jest --coverage",
     "jestc": "jest --clearCache",
