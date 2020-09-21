@@ -21,6 +21,7 @@
   "keywords": [
     "Behavior Tree",
     "Groot",
+    "BehaviorTree.CPP",
     "async"
   ],
   "author": "Benjamin Morse",
