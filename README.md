@@ -1,5 +1,10 @@
+[![Build Status](https://travis-ci.com/esromneb/AsyncBehaviorTree.svg?branch=master)](https://travis-ci.com/esromneb/AsyncBehaviorTree)
 # AsyncBehaviorTree
 My attempt to bring Behavior Trees to js with support for a visual editor.  This project was reverse engineered around the open source tool [Groot](https://github.com/BehaviorTree/Groot).  This [Groot](https://github.com/BehaviorTree/Groot) tool was designed to output trees for [BehaviorTree.CPP](https://github.com/BehaviorTree/BehaviorTree.CPP).  Note that this library is meant as a js port of BehaviorTree without being a direct port.  Many features supported by [BehaviorTree.CPP](https://github.com/BehaviorTree/BehaviorTree.CPP) are not supported by this library.  (I didn't look at the source code of [BehaviorTree.CPP](https://github.com/BehaviorTree/BehaviorTree.CPP) at all when developing this library).
+
+# Example
+![](img/abt-groot-screenshot.png)
+This is a screenshot of [Groot](https://github.com/BehaviorTree/Groot) with a logfile that was written to disk during one of the unit tests.
 
 # Basics
 Create an xml tree file with Groot.  Bind to a "Blackboard" object during instantiation of the class in js.  Execute the tree.
