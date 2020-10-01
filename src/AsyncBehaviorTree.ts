@@ -811,6 +811,7 @@ class AsyncBehaviorTree {
 
   getNodeParent(node: any): any {
     const parentPath = this.getPathParent(node.path);
+    // istanbul ignore if
     if( parentPath == undefined ) {
       return undefined;
     }
@@ -959,6 +960,7 @@ class AsyncBehaviorTree {
     //   debugger;
     // }
 
+    // istanbul ignore if
     if(this.logRecurse) {
       console.log(`Depth ${depth}, path ${path}, hier ${hierarchy}`);
     }
@@ -1157,6 +1159,7 @@ class AsyncBehaviorTree {
   zmq: ABTZmqLogger;
 
 
+  // istanbul ignore next
   async setZmqLogger(l: any, z: ABTZmqLogger): Promise<void> {
     this.logger = l;
     this.zmq = z;
@@ -1177,6 +1180,7 @@ class AsyncBehaviorTree {
 
   zmqTransitions: number = 0;
 
+  // istanbul ignore next
   private zmqGotTransition(buf: Uint8Array) {
     // if( this.zmqTransitions === 1 ) {
 
@@ -1230,6 +1234,7 @@ class AsyncBehaviorTree {
     } else if( cn === node.name ) {
       // everything is ok
     } else {
+      // istanbul ignore next
       throw new Error(`Error for path ${node.path}, ${cn} !== ${node.name}`);
     }
 
