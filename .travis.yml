@@ -5,3 +5,19 @@ node_js:
   - 12
   - 11
   - 10
+
+
+sudo: required
+
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+
+services:
+  - zmq
+
+env:
+  - CC=gcc-7 CXX=g++-7
