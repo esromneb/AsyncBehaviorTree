@@ -575,6 +575,11 @@ class AsyncBehaviorTree {
         throw new Error(`node cannot be undefined here`);
       }
 
+      // istanbul ignore if
+      if( this.printCall ) {
+        console.log(`visit ${node.w}`);
+      }
+
       if( node.w in nesting ) {
         ptr++;
 
