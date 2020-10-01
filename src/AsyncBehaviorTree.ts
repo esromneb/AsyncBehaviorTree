@@ -42,6 +42,51 @@ export interface ABTLogger {
 }
 
 
+// true / false does not matter
+// just the key
+const supportedNodes = {
+  'sequence':true,
+  'fallback':true,
+  'inverter':true,
+  'forcesuccess':true,
+  'action':true,
+  'condition':true,
+};
+
+// true means I plan to support
+// false means I do not plan
+// right now I don't know of a way to support reactive nodes
+// maybe in the future
+const plannedSupport = {
+  'alwaysfailure': true,
+  'alwayssuccess': true,
+  'setblackboard': true,
+  'retryuntilsuccesful': true,
+  'forcefailure': true,
+  'keeprunninguntilfailure': true,
+  'switch2': true,
+  'switch3': true,
+  'switch4': true,
+  'switch5': true,
+  'switch6': true,
+  'blackboardcheckdouble': true,
+  'blackboardcheckint': true,
+  'blackboardcheckstring': true,
+  'repeat': true,
+  'timeout': true,
+  'subtree': true,
+  'subtreeplus': false,
+  'reactivefallback': false,
+  'reactivesequence': false,
+  'ifthenelse': false,
+  'manualselector': false,
+  'sequencestar': false,
+  'parallel': false,
+  'whiledoelse': false,
+};
+
+
+
 class AsyncBehaviorTree {
 
   p: any;

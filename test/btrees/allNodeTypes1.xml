@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Parallel threshold="">
+            <ReactiveFallback>
+                <AlwaysFailure/>
+                <AlwaysSuccess/>
+                <SetBlackboard output_key="" value=""/>
+            </ReactiveFallback>
+            <ReactiveSequence>
+                <IfThenElse>
+                    <ManualSelector repeat_last_selection="0">
+                        <Fallback>
+                            <Parallel threshold="">
+                                <Sequence>
+                                    <SequenceStar>
+                                        <Switch2 case_1="" case_2="" variable="">
+                                            <Switch3 case_1="" case_2="" case_3="" variable="">
+                                                <AlwaysFailure/>
+                                            </Switch3>
+                                        </Switch2>
+                                    </SequenceStar>
+                                </Sequence>
+                            </Parallel>
+                            <Switch4 case_1="" case_2="" case_3="" case_4="" variable="">
+                                <Switch5 case_1="" case_2="" case_3="" case_4="" case_5="" variable="">
+                                    <Switch6 case_1="" case_2="" case_3="" case_4="" case_5="" case_6="" variable="">
+                                        <WhileDoElse>
+                                            <Sequence>
+                                                <BlackboardCheckDouble return_on_mismatch="" value_A="" value_B="">
+                                                    <ForceFailure>
+                                                        <Repeat num_cycles="">
+                                                            <Timeout msec="">
+                                                                <AlwaysSuccess/>
+                                                            </Timeout>
+                                                        </Repeat>
+                                                    </ForceFailure>
+                                                </BlackboardCheckDouble>
+                                                <BlackboardCheckInt return_on_mismatch="" value_A="" value_B="">
+                                                    <ForceSuccess>
+                                                        <KeepRunningUntilFailure>
+                                                            <AlwaysSuccess/>
+                                                        </KeepRunningUntilFailure>
+                                                    </ForceSuccess>
+                                                </BlackboardCheckInt>
+                                                <BlackboardCheckString return_on_mismatch="" value_A="" value_B="">
+                                                    <Inverter>
+                                                        <RetryUntilSuccesful num_attempts="">
+                                                            <AlwaysFailure/>
+                                                        </RetryUntilSuccesful>
+                                                    </Inverter>
+                                                </BlackboardCheckString>
+                                            </Sequence>
+                                        </WhileDoElse>
+                                    </Switch6>
+                                </Switch5>
+                            </Switch4>
+                        </Fallback>
+                    </ManualSelector>
+                </IfThenElse>
+            </ReactiveSequence>
+        </Parallel>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel/>
+    <!-- ////////// -->
+</root>
+

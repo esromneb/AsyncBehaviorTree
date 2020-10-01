@@ -19,6 +19,7 @@ module.exports = {
     "tsx",
     "js"
   ],
+  "modulePathIgnorePatterns": ["test/helpers"],
   "watchPlugins": [
       "jest-watch-typeahead/filename",
       "jest-watch-typeahead/testname"

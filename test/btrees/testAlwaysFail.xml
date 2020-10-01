@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <Action ID="go1"/>
+            <AlwaysFailure/>
+            <Action ID="go2"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="go1"/>
+        <Action ID="go2"/>
+        <Action ID="go3"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
