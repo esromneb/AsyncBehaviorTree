@@ -990,8 +990,16 @@ class AsyncBehaviorTree {
       this.loadPath(path+'0', hierarchy+taglow, fn, props);
 
     } else {
+
+      let msg;
+      if(taglow in plannedSupport && plannedSupport[taglow]) {
+        msg = 'planned support for'
+      } else {
+        msg = 'no plan to support'
+      }
+
       // istanbul ignore next
-      throw new Error(`Unknown tag: ${tag}`);
+      throw new Error(`Unknown tag: ${tag}.  There is ${msg} this tag in the future!`);
     }
 
   }
