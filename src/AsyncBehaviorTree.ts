@@ -13,6 +13,18 @@ export interface IExecuteTree {
   uid?: number;
 }
 
+type Vec2 = [number,number];
+
+export interface ABTZmqLogger {
+  dataCallback(buf: Uint8Array, flushBuf: Vec2[]): void;
+  run(): Promise<void>;
+}
+
+
+export interface IFunctionWriterCb {
+    (buf: Uint8Array): void;
+}
+
 
 export interface ABTLogger {
   start(): Promise<void>;
@@ -26,6 +38,7 @@ export interface ABTLogger {
   getNameForUID(u: number): string;
   getForPath(path: string): number;
   getForPathArray(ps: number[]): number;
+  writeToCallback(cb: IFunctionWriterCb): void;
 }
 
 
@@ -1093,16 +1106,70 @@ class AsyncBehaviorTree {
     this.logger.parseXML(this.rawXml);
 
     this.writeNodeUID();
-
-
   }
 
+
+  zmq: ABTZmqLogger;
+
+
+  async setZmqLogger(l: any, z: ABTZmqLogger): Promise<void> {
+    this.logger = l;
+    this.zmq = z;
+
+    await this.logger.start();
+
+    this.zmqTransitions = 0;
+    this.logger.writeToCallback(this.zmqGotTransition.bind(this));
+
+
+    await this.logger.start();
+    this.logger.registerActionNodes(this.getActionNodes());
+    this.logger.registerConditionNodes(this.getConditionNodes());
+    this.logger.parseXML(this.rawXml);
+
+    this.writeNodeUID();
+  }
+
+  zmqTransitions: number = 0;
+
+  private zmqGotTransition(buf: Uint8Array) {
+    // if( this.zmqTransitions === 1 ) {
+
+    //   let flushList = [
+    //   [1,0],
+    //   [2,2],
+    //   [3,3],
+    //   [4,3],
+    //   [5,2],
+    //   [6,2],
+    //   [7,2],
+    //   [8,3],
+    //   [9,1],
+    //   // [9,2],
+    //   ];
+
+    //   this.zmq.dataCallback(buf, flushList);
+
+    // } else {
+    //   this.zmq.dataCallback(buf, undefined);
+    // }
+
+    this.zmq.dataCallback(buf, undefined);
+
+    this.zmqTransitions++;
+  }
+
+
+
+  // walks the tree and writes node UID
+  // this is only done if there is a file or zmq logger
   private writeNodeUID(): void {
 
     this.walkTree(this.writeNodeUIDInternal.bind(this));
 
   }
 
+  // called by writeNodeUID
   private writeNodeUIDInternal(node: any): void {
 
     // use the path to lookup the uid of the node

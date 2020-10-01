@@ -37,6 +37,7 @@
     "@types/jest": "^26.0.10",
     "@types/node": "^14.6.2",
     "behavior-tree-flat-buffer": "^0.9.7",
+    "behavior-tree-zmq": "^0.5.0",
     "jest": "^26.4.2",
     "jest-raw-loader": "^1.0.1",
     "jest-watch-typeahead": "^0.5.0",
