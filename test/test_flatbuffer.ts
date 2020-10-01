@@ -312,7 +312,7 @@ test.skip("test wasm", async function(done) {
 
   let dut = this.bt = new AsyncBehaviorTree(testTree3a, blackBoard);
 
-  dut.printCall = true;
+  dut.printCall = false;
 
   // console.log(dut.exe);
 
@@ -416,7 +416,7 @@ test("test some integration", async function(done) {
 
   await dut.setFileLogger(btfb, logpath);
 
-  dut.printCall = true;
+  dut.printCall = false;
 
   // console.log(dut.exe);
 

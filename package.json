@@ -10,7 +10,7 @@
     "/dist"
   ],
   "scripts": {
-    "test": "jest --coverage",
+    "test": "jest --coverage --collectCoverageFrom=src/**/*.ts",
     "jestc": "jest --clearCache",
     "jestw": "jest --watch --runInBand --detectOpenHandles",
     "build": "tsc",

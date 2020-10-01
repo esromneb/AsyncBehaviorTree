@@ -19,7 +19,7 @@ module.exports = {
     "tsx",
     "js"
   ],
-  "modulePathIgnorePatterns": ["test/helpers"],
+  "modulePathIgnorePatterns": ["test/helpers", "test/btrees"],
   "watchPlugins": [
       "jest-watch-typeahead/filename",
       "jest-watch-typeahead/testname"
