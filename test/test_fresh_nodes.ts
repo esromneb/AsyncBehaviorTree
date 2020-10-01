@@ -13,6 +13,65 @@ const testFail = require("./btrees/testAlwaysFail.xml");
 
 
 
+
+
+
+
+
+// copied from test_abt_one nested sequence
+test("Test Fail", async function(done) {
+
+  let fail = {};
+
+  let print: boolean = false;
+
+
+  const expected = ['go1'];
+
+
+  let expectedStop = {
+    '1':1,
+    '2':2,
+    '3':3,
+    '4':4,
+    '5':5,
+    '6':6,
+    '7':7,
+    '8':8,
+  }
+
+  let helper = new Blackboard1Parent();
+
+  let dut = this.bt = new AsyncBehaviorTree(testFail, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  helper.reset();
+
+
+  await dut.execute();
+
+  // console.log(helper.blackBoard.called);
+
+    // if( print ) {
+    //   console.log('called', helper.blackBoard.called);
+    // }
+
+    // let thisExpected = expected.slice(0,expectedStop[stop]);
+
+  expect(helper.blackBoard.called).toStrictEqual(['go1']);
+  // }
+
+
+  done();
+
+});
+
+
+
+
 // copied from test_abt_one nested sequence
 test("Test Helper works ", async function(done) {
 

@@ -566,10 +566,6 @@ class AsyncBehaviorTree {
         node = collection.shift();
       }
 
-      if( node.name == "isFull" ) {
-        debugger;
-      }
-
       // istanbul ignore if
       if(node == undefined) {
         throw new Error(`node cannot be undefined here`);
@@ -633,6 +629,12 @@ class AsyncBehaviorTree {
           failUp(node);
         }
 
+      } else if (node.w === 'alwaysfailure') {
+        const res = false;
+
+        this.logTransition(node, false, res);
+
+        failUp(node);
 
       } else {
         // istanbul ignore next
@@ -840,7 +842,8 @@ class AsyncBehaviorTree {
 // type: sequence path: 0.0. x: go1
 // type: sequence path: 0.1.0. x: stay1
 // type: sequence path: 0.2. x: go2
-
+  
+  // x is the string name of the function which will exist on the blackboard
   loadPath(_path, hierarchy: string, x: string, props: any): void {
 
     let exe: any = this.exe;
@@ -893,7 +896,7 @@ class AsyncBehaviorTree {
         exe[i] = {w:type,name:x,args};
         this.writePathToNode(exe[i], type, ps, j);
 
-      } else if( type === 'condition' ) {
+      } else if( type === 'condition' || type === 'alwaysfailure' ) {
         exe[i] = {w:type,name:x};
         this.writePathToNode(exe[i], type, ps, j);
       } else {
@@ -960,6 +963,9 @@ class AsyncBehaviorTree {
     }
   }
 
+
+  // called during initial parse of tree
+  // this is used to convert the xml to this.exe (via loadPath)
   recurse(t: any, depth: number, path: string, hierarchy: string): void {
     // if(depth === 0) {
     //   debugger;
@@ -993,6 +999,10 @@ class AsyncBehaviorTree {
       // let a = t[key]; // xml parser likes to put things in 1 depth array
       // this.recurseSeq(t[key][0], depth+1);
       this.loadPath(path+'0', hierarchy+taglow, fn, props);
+
+    } else if (taglow === 'alwaysfailure') {
+
+      this.loadPath(path+'0', hierarchy+taglow, "", props);
 
     } else {
 
