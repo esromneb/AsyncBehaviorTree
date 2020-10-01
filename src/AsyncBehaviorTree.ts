@@ -991,7 +991,9 @@ class AsyncBehaviorTree {
 
     } else {
 
+      // istanbul ignore next
       let msg;
+      // istanbul ignore next
       if(taglow in plannedSupport && plannedSupport[taglow]) {
         msg = 'planned support for'
       } else {
