@@ -110,7 +110,7 @@ test("Test AlwaysSuccess", async function(done) {
 
 
 
-test.skip("Test testForceFailure", async function(done) {
+test("Test testForceFailure", async function(done) {
 
   let fail = {};
 
@@ -141,7 +141,7 @@ test.skip("Test testForceFailure", async function(done) {
 
   helper.reset();
 
-
+  debugger;
   await dut.execute();
 
   // console.log(helper.blackBoard.called);

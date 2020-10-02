@@ -112,6 +112,7 @@ class AsyncBehaviorTree {
     'fallback':true,
     'inverter':true,
     'forcesuccess':true,
+    'forcefailure':true,
   };
 
   rawXml: string;
@@ -538,7 +539,7 @@ class AsyncBehaviorTree {
           node = this.getNodeParent(node);
           this.logTransition(node, true, false);
 
-        } else if( types[ptr] === 'fallback' || types[ptr] === 'inverter' || types[ptr] === 'forcesuccess' ) {
+        } else if( types[ptr] === 'fallback' || types[ptr] === 'inverter' || types[ptr] === 'forcesuccess' || types[ptr] === 'forcefailure' ) {
           node = this.getNodeParent(node);
           this.logTransition(node, true, false);
           // do nothing, see logic below
@@ -677,6 +678,11 @@ class AsyncBehaviorTree {
           // we are popping a sequence if we get here the sequence succeded
           // we must mark anypass as true for the new level for #35 (part 2)
           anypass[ptr] = true;
+        } else if( types[ptr] === 'forcefailure' ) {
+          popLevel(true);
+          this.logTransition(this.getNodeParent(node), true, false);
+          anypass[ptr] = false;
+          failUp(node);
         } else {
           // istanbul ignore next
           throw new Error(`Unknown types in finish pending: ${types[ptr]}`);
