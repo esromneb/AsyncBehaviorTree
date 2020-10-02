@@ -655,19 +655,19 @@ class AsyncBehaviorTree {
           failUp(node);
         }
 
-      // } else if (node.w === 'alwaysfailure') {
-      //   const res = false;
+      } else if (node.w === 'alwaysfailure') {
+        const res = false;
 
-      //   this.logTransition(node, false, res);
+        this.logTransition(node, false, res);
 
-      //   failUp(node);
+        failUp(node);
 
-      // } else if (node.w === 'alwayssuccess') {
-      //   const res = true;
+      } else if (node.w === 'alwayssuccess') {
+        const res = true;
 
-      //   this.logTransition(node, false, res);
+        this.logTransition(node, false, res);
 
-      //   anypass[ptr] = true;
+        anypass[ptr] = true;
 
       } else {
         // istanbul ignore next
@@ -959,14 +959,13 @@ class AsyncBehaviorTree {
         exe[i] = {w:type,name:x,args};
         this.writePathToNode(exe[i], type, ps, j);
 
-      } else {
+      } else if( type === 'condition' || type === 'alwaysfailure' || type === 'alwayssuccess' || type === 'forcefailure' ) {
         exe[i] = {w:type,name:x};
         this.writePathToNode(exe[i], type, ps, j);
+      } else {
+        // istanbul ignore next
+        throw new Error(`loadPath()[3] Unknown type: ${type}`);
       }
-      // else {
-      //   // istanbul ignore next
-      //   throw new Error(`loadPath()[3] Unknown type: ${type}`);
-      // }
 
       // confusing but this is
       // how we nest down and then loop
@@ -1080,9 +1079,9 @@ class AsyncBehaviorTree {
       // this.recurseSeq(t[key][0], depth+1);
       this.loadPath(path+'0', hierarchy+taglow, fn, props);
 
-    // } else if ( this._rcr_without_id.has(taglow) ) {
+    } else if ( this._rcr_without_id.has(taglow) ) {
 
-    //   this.loadPath(path+'0', hierarchy+taglow, "", props);
+      this.loadPath(path+'0', hierarchy+taglow, "", props);
 
     } else {
 

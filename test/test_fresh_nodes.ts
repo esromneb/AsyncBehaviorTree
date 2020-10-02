@@ -10,7 +10,8 @@ const testTree5 = require("./btrees/testTree5.xml");
 const testTree10 = require("./btrees/testTree10.xml");
 const testFail = require("./btrees/testAlwaysFail.xml");
 const testSuccess = require("./btrees/testAlwaysSuccess.xml");
-const testForceFailure = require("./btrees/testForceFailure.xml");
+const testForceFailure = require("./btrees/testForceFailure1.xml");
+const testForceFailure2 = require("./btrees/testForceFailure2.xml");
 const testForceSuccess = require("./btrees/testForceSuccess.xml");
 const testRepeat = require("./btrees/testRepeat.xml");
 
@@ -23,7 +24,7 @@ const util = require('util');
 
 
 // copied from test_abt_one nested sequence
-test.skip("Test AlwaysFailure", async function(done) {
+test("Test AlwaysFailure", async function(done) {
 
   let fail = {};
 
@@ -59,7 +60,7 @@ test.skip("Test AlwaysFailure", async function(done) {
 });
 
 
-test.skip("Test AlwaysSuccess", async function(done) {
+test("Test AlwaysSuccess", async function(done) {
 
   let fail = {};
 
@@ -112,7 +113,7 @@ test.skip("Test AlwaysSuccess", async function(done) {
 
 
 
-test.skip("Test testForceFailure", async function(done) {
+test("Test testForceFailure", async function(done) {
 
   let print: boolean = false;
 
@@ -151,7 +152,7 @@ test.skip("Test testForceFailure", async function(done) {
 
 });
 
-test.skip("Test testForceSuccess", async function(done) {
+test("Test testForceSuccess", async function(done) {
 
   let print: boolean = false;
 
@@ -243,7 +244,7 @@ test("Test repeat", async function(done) {
 
 
 // copied from test_abt_one nested sequence
-test.skip("Test Helper works ", async function(done) {
+test("Test Helper works ", async function(done) {
 
   let fail = {};
 
