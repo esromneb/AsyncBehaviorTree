@@ -11,6 +11,7 @@ const testTree10 = require("./btrees/testTree10.xml");
 const testFail = require("./btrees/testAlwaysFail.xml");
 const testSuccess = require("./btrees/testAlwaysSuccess.xml");
 const testForceFailure = require("./btrees/testForceFailure.xml");
+const testForceSuccess = require("./btrees/testForceSuccess.xml");
 
 
 
@@ -112,23 +113,14 @@ test("Test AlwaysSuccess", async function(done) {
 
 test("Test testForceFailure", async function(done) {
 
-  let fail = {};
-
   let print: boolean = false;
 
-
-  // const expected = ['go1'];
-
+  const expected = ['go1','go2','go3'];
 
   let expectedStop = {
     '1':1,
     '2':2,
-    '3':3,
-    '4':4,
-    '5':5,
-    '6':6,
-    '7':7,
-    '8':8,
+    '3':2,
   }
 
   let helper = new Blackboard1Parent();
@@ -138,26 +130,61 @@ test("Test testForceFailure", async function(done) {
   dut.printCall = false;
   dut.printParse = false;
 
+  for(let stop in expectedStop) {
+    helper.reset();
+    helper.fail['go'+stop] = true;
 
-  helper.reset();
+    await dut.execute();
 
-  debugger;
-  await dut.execute();
+    if( print ) {
+      console.log('stop', stop, 'called', helper.blackBoard.called);
+    }
 
-  // console.log(helper.blackBoard.called);
+    let thisExpected = expected.slice(0,expectedStop[stop]);
 
-    // if( print ) {
-    //   console.log('called', helper.blackBoard.called);
-    // }
-
-    // let thisExpected = expected.slice(0,expectedStop[stop]);
-
-  expect(helper.blackBoard.called).toStrictEqual(['go1','go2']);
-  // }
+    expect(helper.blackBoard.called).toStrictEqual(thisExpected);
+  }
 
 
   done();
 
+});
+
+test("Test testForceSuccess", async function(done) {
+
+  let print: boolean = false;
+
+  const expected = ['go1','go2','go3'];
+
+  let expectedStop = {
+    '1':1,
+    '2':3,
+    '3':3,
+  }
+
+  let helper = new Blackboard1Parent();
+
+  let dut = this.bt = new AsyncBehaviorTree(testForceSuccess, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+  for(let stop in expectedStop) {
+    helper.reset();
+    helper.fail['go'+stop] = true;
+
+    await dut.execute();
+
+    if( print ) {
+      console.log('stop', stop, 'called', helper.blackBoard.called);
+    }
+
+    let thisExpected = expected.slice(0,expectedStop[stop]);
+
+    expect(helper.blackBoard.called).toStrictEqual(thisExpected);
+  }
+
+  done();
 });
 
 

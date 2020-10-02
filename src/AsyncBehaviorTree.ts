@@ -107,13 +107,13 @@ class AsyncBehaviorTree {
 
   destroyed: boolean = false;
 
-  nestingTypes: any = {
-    'sequence':true,
-    'fallback':true,
-    'inverter':true,
-    'forcesuccess':true,
-    'forcefailure':true,
-  };
+  nestingTypes: Set<string> = new Set([
+    'sequence',
+    'fallback',
+    'inverter',
+    'forcesuccess',
+    'forcefailure',
+  ]);
 
   rawXml: string;
 
@@ -577,7 +577,7 @@ class AsyncBehaviorTree {
         console.log(`visit ${node.w}`);
       }
 
-      if( node.w in nesting ) {
+      if( nesting.has(node.w) ) {
         ptr++;
 
         // istanbul ignore if
@@ -737,7 +737,7 @@ class AsyncBehaviorTree {
         throw new Error(`node cannot be undefined here`);
       }
 
-      if( node.w in nesting ) {
+      if( nesting.has(node.w) ) {
         ptr++;
 
         // istanbul ignore if
@@ -773,7 +773,7 @@ class AsyncBehaviorTree {
       // if we are empty we need to decide pop behavior
       while( (ptr > 0 && pending[ptr].length == 0) ) {
         
-        if( types[ptr] in nesting ) {
+        if( nesting.has(types[ptr]) ) {
           popLevel();
         } else {
           // istanbul ignore next
@@ -891,7 +891,7 @@ class AsyncBehaviorTree {
 
       // console.log(hs);
 
-      if( type in nesting ) {
+      if( nesting.has(type) ) {
         if( exe[i] == undefined ) {
           exe[i] = {w:type,seq:[]};
           this.writePathToNode(exe[i], type, ps, j);
@@ -919,7 +919,7 @@ class AsyncBehaviorTree {
 
       // confusing but this is
       // how we nest down and then loop
-      if( type in nesting ) {
+      if( nesting.has(type) ) {
         exe = exe[i].seq;
       } else if( type === 'action' ) {
         exe = exe[i]
@@ -1010,7 +1010,7 @@ class AsyncBehaviorTree {
 
     // console.log('key ' + key);
 
-    if( taglow in nesting ) {
+    if( nesting.has(taglow) ) {
       // debugger;
       for(let i = 0; i < children.length; i++) {
 
@@ -1280,7 +1280,7 @@ class AsyncBehaviorTree {
 
     const cnlow = cn.toLowerCase();
 
-    if( cnlow in this.nestingTypes ) {
+    if( this.nestingTypes.has(cnlow) ) {
       // if it's a nesting node, the name is the node type, so we can't check
     } else if( cn === node.name ) {
       // everything is ok
@@ -1315,7 +1315,7 @@ class AsyncBehaviorTree {
       return;
     }
 
-    const nest = (node.w in this.nestingTypes);
+    const nest = this.nestingTypes.has(node.w);
 
     if( nest ) {
 
