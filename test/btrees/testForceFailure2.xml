@@ -12,15 +12,21 @@
             </ForceFailure>
             <Sequence>
                 <ForceFailure>
-                    <Action ID="go4"/>
+                    <ForceFailure>
+                        <Action ID="go4"/>
+                    </ForceFailure>
                 </ForceFailure>
+                <Action ID="go5"/>
             </Sequence>
             <Sequence>
-                <Action ID="go5"/>
-                <Action ID="go6"/>
-                <ForceFailure>
+                <Sequence>
+                    <Action ID="go6"/>
                     <Action ID="go7"/>
-                </ForceFailure>
+                    <ForceFailure>
+                        <Action ID="go8"/>
+                    </ForceFailure>
+                </Sequence>
+                <Action ID="go9"/>
             </Sequence>
         </Fallback>
     </BehaviorTree>
@@ -33,6 +39,8 @@
         <Action ID="go5"/>
         <Action ID="go6"/>
         <Action ID="go7"/>
+        <Action ID="go8"/>
+        <Action ID="go9"/>
     </TreeNodesModel>
     <!-- ////////// -->
 </root>

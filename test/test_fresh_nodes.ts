@@ -26,7 +26,6 @@ const util = require('util');
 // copied from test_abt_one nested sequence
 test("Test AlwaysFailure", async function(done) {
 
-  let fail = {};
 
   let print: boolean = false;
 
@@ -62,7 +61,6 @@ test("Test AlwaysFailure", async function(done) {
 
 test("Test AlwaysSuccess", async function(done) {
 
-  let fail = {};
 
   let print: boolean = false;
 
@@ -151,6 +149,60 @@ test("Test testForceFailure", async function(done) {
   done();
 
 });
+
+
+
+test("Test testForceFailure 2", async function(done) {
+
+  let print: boolean = false;
+
+  const expected = ['go1','go2','go3', 'go4', 'go6', 'go7', 'go8'];
+
+  let expectedStop = {
+    '1':['go1','go2','go3', 'go4', 'go6', 'go7', 'go8'],
+    '2':['go1','go2', 'go4', 'go6', 'go7', 'go8'],
+    '3':['go1','go2','go3', 'go4', 'go6', 'go7', 'go8'],
+    '4':['go1','go2','go3', 'go4', 'go6', 'go7', 'go8'],
+    '5':['go1','go2','go3', 'go4', 'go6', 'go7', 'go8'],
+    '6':['go1','go2','go3', 'go4', 'go6'],
+    '7':['go1','go2','go3', 'go4', 'go6', 'go7'],
+    '8':['go1','go2','go3', 'go4', 'go6', 'go7', 'go8'],
+    // '2':2,
+    // '3':2,
+  }
+
+  let helper = new Blackboard1Parent();
+
+  let dut = this.bt = new AsyncBehaviorTree(testForceFailure2, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+  for(let stop in expectedStop) {
+    helper.reset();
+    helper.fail['go'+stop] = false;
+
+    await dut.execute();
+
+    if( print ) {
+      console.log('stop', stop, 'called', helper.blackBoard.called);
+    }
+
+    let thisExpected = expectedStop[stop];
+
+    expect(helper.blackBoard.called).toStrictEqual(thisExpected);
+  }
+
+
+  done();
+
+});
+
+
+
+
+
+
 
 test("Test testForceSuccess", async function(done) {
 

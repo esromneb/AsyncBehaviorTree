@@ -21,6 +21,7 @@ class Blackboard1Parent {
       go6:    ()=>{that.blackBoard.called.push('go6');    return 'go6'    in that.fail ? false : true},
       go7:    ()=>{that.blackBoard.called.push('go7');    return 'go7'    in that.fail ? false : true},
       go8:    ()=>{that.blackBoard.called.push('go8');    return 'go8'    in that.fail ? false : true},
+      go9:    ()=>{that.blackBoard.called.push('go9');    return 'go9'    in that.fail ? false : true},
       stay1:  ()=>{that.blackBoard.called.push('stay1');  return 'stay1'  in that.fail ? false : true},
       stay2:  ()=>{that.blackBoard.called.push('stay2');  return 'stay2'  in that.fail ? false : true},
       cIName: ()=>{that.blackBoard.called.push('cIName'); return 'cIName' in that.fail ? false : true},
