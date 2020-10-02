@@ -903,7 +903,7 @@ class AsyncBehaviorTree {
         exe[i] = {w:type,name:x,args};
         this.writePathToNode(exe[i], type, ps, j);
 
-      } else if( type === 'condition' || type === 'alwaysfailure' || type === 'alwayssuccess' ) {
+      } else if( type === 'condition' || type === 'alwaysfailure' || type === 'alwayssuccess' || type === 'forcefailure' ) {
         exe[i] = {w:type,name:x};
         this.writePathToNode(exe[i], type, ps, j);
       } else {
@@ -971,6 +971,19 @@ class AsyncBehaviorTree {
   }
 
 
+  // lookups for the recurse function
+  private _rcr_with_id: Set<string> = new Set([
+    'action',
+    'condition',
+  ]);
+
+  private _rcr_without_id: Set<string> = new Set([
+    'forcefailure',
+    'alwaysfailure',
+    'alwayssuccess',
+  ]);
+
+
   // called during initial parse of tree
   // this is used to convert the xml to this.exe (via loadPath)
   recurse(t: any, depth: number, path: string, hierarchy: string): void {
@@ -1000,14 +1013,14 @@ class AsyncBehaviorTree {
 
         this.recurse(children[i], depth+1, pp, hierarchy+taglow+'.');
       }
-    } else if( taglow === 'action' || taglow === 'condition' ) {
+    } else if( this._rcr_with_id.has(taglow) ) {
       // debugger;
-      let fn = props.ID;
+      const fn = props.ID;
       // let a = t[key]; // xml parser likes to put things in 1 depth array
       // this.recurseSeq(t[key][0], depth+1);
       this.loadPath(path+'0', hierarchy+taglow, fn, props);
 
-    } else if (taglow === 'alwaysfailure' || taglow === 'alwayssuccess') {
+    } else if ( this._rcr_without_id.has(taglow) ) {
 
       this.loadPath(path+'0', hierarchy+taglow, "", props);
 

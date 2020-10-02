@@ -10,6 +10,7 @@ const testTree5 = require("./btrees/testTree5.xml");
 const testTree10 = require("./btrees/testTree10.xml");
 const testFail = require("./btrees/testAlwaysFail.xml");
 const testSuccess = require("./btrees/testAlwaysSuccess.xml");
+const testForceFailure = require("./btrees/testForceFailure.xml");
 
 
 
@@ -80,6 +81,59 @@ test("Test AlwaysSuccess", async function(done) {
   let helper = new Blackboard1Parent();
 
   let dut = this.bt = new AsyncBehaviorTree(testSuccess, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  helper.reset();
+
+
+  await dut.execute();
+
+  // console.log(helper.blackBoard.called);
+
+    // if( print ) {
+    //   console.log('called', helper.blackBoard.called);
+    // }
+
+    // let thisExpected = expected.slice(0,expectedStop[stop]);
+
+  expect(helper.blackBoard.called).toStrictEqual(['go1','go2']);
+  // }
+
+
+  done();
+
+});
+
+
+
+
+test.skip("Test testForceFailure", async function(done) {
+
+  let fail = {};
+
+  let print: boolean = false;
+
+
+  // const expected = ['go1'];
+
+
+  let expectedStop = {
+    '1':1,
+    '2':2,
+    '3':3,
+    '4':4,
+    '5':5,
+    '6':6,
+    '7':7,
+    '8':8,
+  }
+
+  let helper = new Blackboard1Parent();
+
+  let dut = this.bt = new AsyncBehaviorTree(testForceFailure, helper.blackBoard);
 
   dut.printCall = false;
   dut.printParse = false;
