@@ -51,6 +51,8 @@ const supportedNodes = {
   'forcesuccess':true,
   'action':true,
   'condition':true,
+  'alwaysfailure': true,
+  'alwayssuccess': true,
 };
 
 // true means I plan to support
@@ -58,11 +60,9 @@ const supportedNodes = {
 // right now I don't know of a way to support reactive nodes
 // maybe in the future
 const plannedSupport = {
-  'alwaysfailure': true,
-  'alwayssuccess': true,
+  'forcefailure': true,
   'setblackboard': true,
   'retryuntilsuccesful': true,
-  'forcefailure': true,
   'keeprunninguntilfailure': true,
   'switch2': true,
   'switch3': true,
@@ -636,6 +636,13 @@ class AsyncBehaviorTree {
 
         failUp(node);
 
+      } else if (node.w === 'alwayssuccess') {
+        const res = true;
+
+        this.logTransition(node, false, res);
+
+        anypass[ptr] = true;
+
       } else {
         // istanbul ignore next
         throw new Error(`Unknown walk type: ${node.w}`);
@@ -896,7 +903,7 @@ class AsyncBehaviorTree {
         exe[i] = {w:type,name:x,args};
         this.writePathToNode(exe[i], type, ps, j);
 
-      } else if( type === 'condition' || type === 'alwaysfailure' ) {
+      } else if( type === 'condition' || type === 'alwaysfailure' || type === 'alwayssuccess' ) {
         exe[i] = {w:type,name:x};
         this.writePathToNode(exe[i], type, ps, j);
       } else {
@@ -1000,7 +1007,7 @@ class AsyncBehaviorTree {
       // this.recurseSeq(t[key][0], depth+1);
       this.loadPath(path+'0', hierarchy+taglow, fn, props);
 
-    } else if (taglow === 'alwaysfailure') {
+    } else if (taglow === 'alwaysfailure' || taglow === 'alwayssuccess') {
 
       this.loadPath(path+'0', hierarchy+taglow, "", props);
 
