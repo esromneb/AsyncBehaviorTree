@@ -26,6 +26,9 @@ class Blackboard1Parent {
       stay2:  ()=>{that.blackBoard.called.push('stay2');  return 'stay2'  in that.fail ? false : true},
       cIName: ()=>{that.blackBoard.called.push('cIName'); return 'cIName' in that.fail ? false : true},
       isFull: true,
+      valueA: 0,
+      valueB: 1,
+      valueC: 2
     }
 
     // for good measure
@@ -36,6 +39,9 @@ class Blackboard1Parent {
     this.fail = {};
     this.blackBoard.called = [];
     this.blackBoard.isFull = true;
+    this.blackBoard.valueA = 0;
+    this.blackBoard.valueB = 1;
+    this.blackBoard.valueC = 2;
 
   }
 }

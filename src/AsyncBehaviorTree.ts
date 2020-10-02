@@ -55,6 +55,7 @@ const supportedNodes = {
   'alwayssuccess': true,
   'forcefailure': true,
   'repeat': true,
+  'setblackboard': true,
 };
 
 // true means I plan to support
@@ -62,7 +63,6 @@ const supportedNodes = {
 // right now I don't know of a way to support reactive nodes
 // maybe in the future
 const plannedSupport = {
-  'setblackboard': true,
   'retryuntilsuccesful': true,
   'keeprunninguntilfailure': true,
   'switch2': true,
@@ -216,6 +216,8 @@ class AsyncBehaviorTree {
   }
 
   // returns true if successful
+  // rawValue is the path
+  // value is the value to write there
   detectAndStoreBraceValues(rawValue: string, value: any): boolean {
     const rawTrimmed = rawValue.trim();
     if(this.scanForVariable(rawTrimmed)) {
@@ -499,6 +501,27 @@ class AsyncBehaviorTree {
     }
   }
 
+  handleSetBlackboard(node: any): boolean {
+
+    const rawValue2 = node.args['output_key'];
+
+    // istanbul ignore if
+    if( this.printCall ) {
+      console.log(`calling setBlackboard ${rawValue2}`);
+    }
+
+
+    const rawValue = node.args['value'];
+    const loaded = this.detectAndLoadBraceValues(rawValue);
+    const worked = this.detectAndStoreBraceValues(rawValue2, loaded);
+
+    if( !worked ) {
+      this.warning(`handleSetBlackboard node '${node.path}' tried to use the string '${rawValue}' as a destination variable`);
+    }
+
+    return true;
+  }
+
   // see https://medium.com/@kenny.hom27/breadth-first-vs-depth-first-tree-traversal-in-javascript-48df2ebfc6d1#fe0b
   // this is a DFS through the behavior tree (this.exe)
   // we save the current level into the pending[]
@@ -593,6 +616,7 @@ class AsyncBehaviorTree {
       if( this.printCall ) {
         console.log(`visit ${node.w}`);
       }
+      // console.log(node);
 
       if( nesting.has(node.w) ) {
         ptr++;
@@ -609,7 +633,6 @@ class AsyncBehaviorTree {
 
         if( node.w === 'repeat' ) {
           meta[ptr].repeat = parseInt(node.args.num_cycles, 10);
-          // console.log(node);
         }
 
         pending[ptr].unshift(...node.seq);
@@ -640,7 +663,15 @@ class AsyncBehaviorTree {
           failUp(node);
         }
 
+      } else if (node.w === 'setblackboard') {
 
+        // console.log(meta[ptr]);
+
+        const res = this.handleSetBlackboard(node);
+
+        this.logTransition(node, false, true);
+
+        anypass[ptr] = true;
 
       } else if (node.w === 'condition') {
         const res = this.evaluateCondition(node.name);
@@ -883,6 +914,7 @@ class AsyncBehaviorTree {
   portedNodes: Set<string> = new Set([
     'action',
     'repeat',
+    'setblackboard',
   ]);
 
 
@@ -1038,6 +1070,7 @@ class AsyncBehaviorTree {
     'alwaysfailure',
     'alwayssuccess',
     'repeat',
+    'setblackboard',
   ]);
 
 

@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="BehaviorTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="BehaviorTree">
+        <Sequence>
+            <Action ID="go1"/>
+            <SetBlackboard output_key="${valueA}" value="8"/>
+            <Action ID="go2"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="go1"/>
+        <Action ID="go2"/>
+        <Action ID="go3"/>
+        <Action ID="go4"/>
+        <Action ID="go5"/>
+        <Action ID="go6"/>
+        <Action ID="go7"/>
+        <Action ID="go8"/>
+        <Action ID="go9"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
