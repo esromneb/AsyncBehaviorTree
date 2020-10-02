@@ -53,6 +53,8 @@ const supportedNodes = {
   'condition':true,
   'alwaysfailure': true,
   'alwayssuccess': true,
+  'forcefailure': true,
+  'repeat': true,
 };
 
 // true means I plan to support
@@ -60,7 +62,6 @@ const supportedNodes = {
 // right now I don't know of a way to support reactive nodes
 // maybe in the future
 const plannedSupport = {
-  'forcefailure': true,
   'setblackboard': true,
   'retryuntilsuccesful': true,
   'keeprunninguntilfailure': true,
@@ -72,7 +73,6 @@ const plannedSupport = {
   'blackboardcheckdouble': true,
   'blackboardcheckint': true,
   'blackboardcheckstring': true,
-  'repeat': true,
   'timeout': true,
   'subtree': true,
   'subtreeplus': false,
@@ -113,6 +113,7 @@ class AsyncBehaviorTree {
     'inverter',
     'forcesuccess',
     'forcefailure',
+    'repeat',
   ]);
 
   rawXml: string;
@@ -518,12 +519,14 @@ class AsyncBehaviorTree {
     const pending: any[][] = [[]];
     const types: string[] = [];
     const anypass: boolean[] = [];
+    const meta: any[] = [];
     let ptr = -1;
 
     const popLevel = (success: boolean): void => {
       pending.pop();
       types.pop();
       anypass.pop();
+      meta.pop();
       ptr--;
     }
 
@@ -534,7 +537,7 @@ class AsyncBehaviorTree {
       while(ptr >= 0) {
 
         // fail all the way up
-        if( types[ptr] === 'sequence' ) {
+        if( types[ptr] === 'sequence' || types[ptr] === 'repeat' ) {
           popLevel(false);
           node = this.getNodeParent(node);
           this.logTransition(node, true, false);
@@ -563,6 +566,20 @@ class AsyncBehaviorTree {
       let node;
       if( ptr > -1 && pending[ptr].length ) {
         node = pending[ptr].shift();
+
+        // if we are in a repeat node, 
+        // we want to "re-inject" the node into the pending list
+        // until we are at the last repeat
+
+        // console.log(meta[ptr]);
+        if( 'repeat' in meta[ptr] ) {
+          if( meta[ptr].repeat > 1 ) {
+            // console.log(`re-inject for ${meta[ptr].repeat}`);
+            pending[ptr].unshift(node);
+            meta[ptr].repeat--;
+          }
+        }
+
       } else {
         node = collection.shift();
       }
@@ -588,6 +605,12 @@ class AsyncBehaviorTree {
         pending[ptr] = [];
         types  [ptr] = node.w;
         anypass[ptr] = false;
+        meta   [ptr] = {};
+
+        if( node.w === 'repeat' ) {
+          meta[ptr].repeat = parseInt(node.args.num_cycles, 10);
+          // console.log(node);
+        }
 
         pending[ptr].unshift(...node.seq);
 
@@ -598,6 +621,8 @@ class AsyncBehaviorTree {
           console.log(`nesting ${node.w}`);
         }
       } else if (node.w === 'action') {
+
+        // console.log(meta[ptr]);
 
         const res = await this.callAction(node);
 
@@ -630,19 +655,19 @@ class AsyncBehaviorTree {
           failUp(node);
         }
 
-      } else if (node.w === 'alwaysfailure') {
-        const res = false;
+      // } else if (node.w === 'alwaysfailure') {
+      //   const res = false;
 
-        this.logTransition(node, false, res);
+      //   this.logTransition(node, false, res);
 
-        failUp(node);
+      //   failUp(node);
 
-      } else if (node.w === 'alwayssuccess') {
-        const res = true;
+      // } else if (node.w === 'alwayssuccess') {
+      //   const res = true;
 
-        this.logTransition(node, false, res);
+      //   this.logTransition(node, false, res);
 
-        anypass[ptr] = true;
+      //   anypass[ptr] = true;
 
       } else {
         // istanbul ignore next
@@ -678,6 +703,9 @@ class AsyncBehaviorTree {
           // we are popping a sequence if we get here the sequence succeded
           // we must mark anypass as true for the new level for #35 (part 2)
           anypass[ptr] = true;
+        } else if( types[ptr] === 'repeat') {
+          popLevel(true);
+          this.logTransition(this.getNodeParent(node), true, true);
         } else if( types[ptr] === 'forcefailure' ) {
           popLevel(true);
           this.logTransition(this.getNodeParent(node), true, false);
@@ -851,6 +879,12 @@ class AsyncBehaviorTree {
     node.path = slc.join('.');
   }
 
+  // note types with ports
+  portedNodes: Set<string> = new Set([
+    'action',
+    'repeat',
+  ]);
+
 
 // type: sequence path: 0.0. x: go1
 // type: sequence path: 0.1.0. x: stay1
@@ -891,12 +925,28 @@ class AsyncBehaviorTree {
 
       // console.log(hs);
 
-      if( nesting.has(type) ) {
+      if( this.portedNodes.has(type) && nesting.has(type) ) {
+        if( exe[i] == undefined ) {
+
+          let args = {};
+          for( let a in props ) {
+            // istanbul ignore if
+            if (a==='ID') {
+              continue;
+            }
+            args[a] = props[a];
+          }
+
+          exe[i] = {w:type,name:x,args,seq:[]};
+          this.writePathToNode(exe[i], type, ps, j);
+        }
+
+      } else if( nesting.has(type) ) {
         if( exe[i] == undefined ) {
           exe[i] = {w:type,seq:[]};
           this.writePathToNode(exe[i], type, ps, j);
         }
-      } else if( type === 'action' ) {
+      } else if( this.portedNodes.has(type) ) {
 
         let args = {};
         for( let a in props ) {
@@ -909,13 +959,14 @@ class AsyncBehaviorTree {
         exe[i] = {w:type,name:x,args};
         this.writePathToNode(exe[i], type, ps, j);
 
-      } else if( type === 'condition' || type === 'alwaysfailure' || type === 'alwayssuccess' || type === 'forcefailure' ) {
+      } else {
         exe[i] = {w:type,name:x};
         this.writePathToNode(exe[i], type, ps, j);
-      } else {
-        // istanbul ignore next
-        throw new Error(`loadPath()[3] Unknown type: ${type}`);
       }
+      // else {
+      //   // istanbul ignore next
+      //   throw new Error(`loadPath()[3] Unknown type: ${type}`);
+      // }
 
       // confusing but this is
       // how we nest down and then loop
@@ -987,6 +1038,7 @@ class AsyncBehaviorTree {
     'forcefailure',
     'alwaysfailure',
     'alwayssuccess',
+    'repeat',
   ]);
 
 
@@ -1014,6 +1066,8 @@ class AsyncBehaviorTree {
       // debugger;
       for(let i = 0; i < children.length; i++) {
 
+        this.loadPath(path+'0', hierarchy+taglow, "", props);
+
         const pp = path+i+'.';
         // console.log("calling with path: "+ pp);
 
@@ -1026,9 +1080,9 @@ class AsyncBehaviorTree {
       // this.recurseSeq(t[key][0], depth+1);
       this.loadPath(path+'0', hierarchy+taglow, fn, props);
 
-    } else if ( this._rcr_without_id.has(taglow) ) {
+    // } else if ( this._rcr_without_id.has(taglow) ) {
 
-      this.loadPath(path+'0', hierarchy+taglow, "", props);
+    //   this.loadPath(path+'0', hierarchy+taglow, "", props);
 
     } else {
 

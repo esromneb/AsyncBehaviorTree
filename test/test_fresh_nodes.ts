@@ -12,9 +12,10 @@ const testFail = require("./btrees/testAlwaysFail.xml");
 const testSuccess = require("./btrees/testAlwaysSuccess.xml");
 const testForceFailure = require("./btrees/testForceFailure.xml");
 const testForceSuccess = require("./btrees/testForceSuccess.xml");
+const testRepeat = require("./btrees/testRepeat.xml");
 
 
-
+const util = require('util');
 
 
 
@@ -22,7 +23,7 @@ const testForceSuccess = require("./btrees/testForceSuccess.xml");
 
 
 // copied from test_abt_one nested sequence
-test("Test AlwaysFailure", async function(done) {
+test.skip("Test AlwaysFailure", async function(done) {
 
   let fail = {};
 
@@ -58,7 +59,7 @@ test("Test AlwaysFailure", async function(done) {
 });
 
 
-test("Test AlwaysSuccess", async function(done) {
+test.skip("Test AlwaysSuccess", async function(done) {
 
   let fail = {};
 
@@ -111,7 +112,7 @@ test("Test AlwaysSuccess", async function(done) {
 
 
 
-test("Test testForceFailure", async function(done) {
+test.skip("Test testForceFailure", async function(done) {
 
   let print: boolean = false;
 
@@ -150,7 +151,7 @@ test("Test testForceFailure", async function(done) {
 
 });
 
-test("Test testForceSuccess", async function(done) {
+test.skip("Test testForceSuccess", async function(done) {
 
   let print: boolean = false;
 
@@ -191,8 +192,58 @@ test("Test testForceSuccess", async function(done) {
 
 
 
+test("Test repeat", async function(done) {
+
+
+  const expected = ['go1','go2','go2','go2','go3'];
+
+  let expectedStop = {
+    '1':1,
+    '2':2,
+    '3':5,
+  }
+
+  let helper = new Blackboard1Parent();
+
+  let dut = new AsyncBehaviorTree(testRepeat, helper.blackBoard);
+
+  // console.log(util.inspect(dut.exe,{depth:null,colors:true}));
+
+
+
+
+  let print: boolean = false;
+  dut.printCall = false;
+  dut.printParse = false;
+
+  for(let stop in expectedStop) {
+    helper.reset();
+    helper.fail['go'+stop] = true;
+    // console.log('--------------', helper.fail);
+
+    await dut.execute();
+
+    if( print ) {
+      console.log('stop:', stop, 'called:', helper.blackBoard.called);
+    }
+
+    let thisExpected = expected.slice(0,expectedStop[stop]);
+
+    expect(helper.blackBoard.called).toStrictEqual(thisExpected);
+  }
+
+  done();
+});
+
+
+
+
+
+
+
+
 // copied from test_abt_one nested sequence
-test("Test Helper works ", async function(done) {
+test.skip("Test Helper works ", async function(done) {
 
   let fail = {};
 
@@ -258,51 +309,3 @@ test("Test Helper works ", async function(done) {
 
 });
 
-
-
-
-// test("test zmq integration", async function(done) {
-
-//   const logpath = './node5b.fbl';
-
-
-//   let zut = new BehaviorTreeZmq();
-
-
-//   let print: boolean = false;
-
-//   // const expected = ['go1'];
-
-//   let dut = new AsyncBehaviorTree(testTree5b, blackBoard);
-
-//   await dut.setZmqLogger(btfb, zut);
-
-//   await zut.run();
-
-//   // await dut.setFileLogger(btfb, logpath);
-
-//   dut.printCall = true;
-
-//   // console.log(dut.exe);
-
-//   // console.log(util.inspect(dut.exe, {showHidden: false, depth: null}))
-
-
-
-//   reset();
-
-//   fail = []
-//   blackBoard.isFull = false;
-
-//   while(1) {
-//     await dut.execute();
-//   }
-
-
-//   setTimeout(()=>{
-
-//     done();
-//   }, runServerFor-1000);
-
-
-// });
