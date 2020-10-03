@@ -14,6 +14,7 @@ const testForceFailure = require("./btrees/testForceFailure1.xml");
 const testForceFailure2 = require("./btrees/testForceFailure2.xml");
 const testForceSuccess = require("./btrees/testForceSuccess.xml");
 const testRepeat = require("./btrees/testRepeat.xml");
+const testRepeatVar = require("./btrees/testRepeatVar.xml");
 
 
 const util = require('util');
@@ -259,6 +260,52 @@ test("Test repeat", async function(done) {
   let helper = new Blackboard1Parent();
 
   let dut = new AsyncBehaviorTree(testRepeat, helper.blackBoard);
+
+  // console.log(util.inspect(dut.exe,{depth:null,colors:true}));
+
+
+
+
+  let print: boolean = false;
+  dut.printCall = false;
+  dut.printParse = false;
+
+  for(let stop in expectedStop) {
+    helper.reset();
+    helper.fail['go'+stop] = true;
+    // console.log('--------------', helper.fail);
+
+    await dut.execute();
+
+    if( print ) {
+      console.log('stop:', stop, 'called:', helper.blackBoard.called);
+    }
+
+    let thisExpected = expected.slice(0,expectedStop[stop]);
+
+    expect(helper.blackBoard.called).toStrictEqual(thisExpected);
+  }
+
+  done();
+});
+
+
+
+
+test("Test repeat Var", async function(done) {
+
+
+  const expected = ['go1','go2','go2','go2','go3'];
+
+  let expectedStop = {
+    '1':1,
+    '2':2,
+    '3':5,
+  }
+
+  let helper = new Blackboard1Parent();
+
+  let dut = new AsyncBehaviorTree(testRepeatVar, helper.blackBoard);
 
   // console.log(util.inspect(dut.exe,{depth:null,colors:true}));
 

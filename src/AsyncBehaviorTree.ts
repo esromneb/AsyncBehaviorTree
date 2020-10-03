@@ -712,7 +712,7 @@ class AsyncBehaviorTree {
         meta   [ptr] = {};
 
         if( node.w === 'repeat' ) {
-          meta[ptr].repeat = parseInt(node.args.num_cycles, 10);
+          meta[ptr].repeat = parseInt(this.detectAndLoadBraceValues(node.args.num_cycles), 10);
         }
 
         pending[ptr].unshift(...node.seq);
