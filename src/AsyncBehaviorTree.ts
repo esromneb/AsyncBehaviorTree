@@ -61,6 +61,7 @@ const supportedNodes = {
   'forcefailure': true,
   'repeat': true,
   'setblackboard': true,
+  'retryuntilsuccesful': true,
 };
 
 // true means I plan to support
@@ -68,7 +69,6 @@ const supportedNodes = {
 // right now I don't know of a way to support reactive nodes
 // maybe in the future
 const plannedSupport = {
-  'retryuntilsuccesful': true,
   'keeprunninguntilfailure': true,
   'switch2': true,
   'switch3': true,
@@ -119,6 +119,7 @@ class AsyncBehaviorTree {
     'forcesuccess',
     'forcefailure',
     'repeat',
+    'retryuntilsuccesful',
   ]);
 
   rawXml: string;
@@ -644,7 +645,13 @@ class AsyncBehaviorTree {
           popLevel(false);
           node = this.getNodeParent(node);
           this.logTransition(node, true, false);
-
+        } else if( types[ptr] === 'retryuntilsuccesful' ) {
+          if( meta[ptr].retry > 0 ) {
+            this.logTransition(node, anypass[ptr], false);
+            break;
+          }
+          this.logTransition(node, anypass[ptr], false);
+          popLevel(false);
         } else if( types[ptr] === 'fallback' || types[ptr] === 'inverter' || types[ptr] === 'forcesuccess' || types[ptr] === 'forcefailure' ) {
           node = this.getNodeParent(node);
           this.logTransition(node, true, false);
@@ -659,6 +666,7 @@ class AsyncBehaviorTree {
 
     
     while( (ptr > 0) || (ptr > -1 && pending[ptr].length) || collection.length) {
+      let skipThisNode = false;
       // debugger;
 
       // istanbul ignore if
@@ -681,7 +689,19 @@ class AsyncBehaviorTree {
             pending[ptr].unshift(node);
             meta[ptr].repeat--;
           }
+        } else if( 'retry' in meta[ptr] ) {
+          if( anypass[ptr] ) {
+            meta[ptr].retry = 0;
+            skipThisNode = true;
+          } else if( meta[ptr].retry > 1 ) {
+            pending[ptr].unshift(node);
+            meta[ptr].retry--;
+          } else if( meta[ptr].retry <= 1 )  {
+            // console.log('else case');
+            meta[ptr].retry = 0;
+          }
         }
+
 
       } else {
         node = collection.shift();
@@ -698,7 +718,9 @@ class AsyncBehaviorTree {
       }
       // console.log(node);
 
-      if( nesting.has(node.w) ) {
+      if( skipThisNode ) {
+        // do nothing
+      } else if( nesting.has(node.w) ) {
         ptr++;
 
         // istanbul ignore if
@@ -713,6 +735,8 @@ class AsyncBehaviorTree {
 
         if( node.w === 'repeat' ) {
           meta[ptr].repeat = parseInt(this.detectAndLoadBraceValues(node.args.num_cycles), 10);
+        } else if( node.w === 'retryuntilsuccesful' ) {
+          meta[ptr].retry = parseInt(this.detectAndLoadBraceValues(node.args.num_attempts), 10);
         }
 
         pending[ptr].unshift(...node.seq);
@@ -817,6 +841,15 @@ class AsyncBehaviorTree {
         } else if( types[ptr] === 'repeat') {
           popLevel(true);
           this.logTransition(this.getNodeParent(node), true, true);
+        } else if( types[ptr] === 'retryuntilsuccesful') {
+          if( anypass[ptr] ) {
+            popLevel(true);
+          } else {
+            // maybe able to delete
+            // istanbul ignore next
+            failUp(node);
+          }
+          this.logTransition(this.getNodeParent(node), anypass[ptr], true);
         } else if( types[ptr] === 'forcefailure' ) {
           popLevel(true);
           this.logTransition(this.getNodeParent(node), true, false);
@@ -994,6 +1027,7 @@ class AsyncBehaviorTree {
   portedNodes: Set<string> = new Set([
     'action',
     'repeat',
+    'retryuntilsuccesful',
     'setblackboard',
   ]);
 
@@ -1151,6 +1185,7 @@ class AsyncBehaviorTree {
     'alwayssuccess',
     'repeat',
     'setblackboard',
+    'retryuntilsuccesful',
   ]);
 
 

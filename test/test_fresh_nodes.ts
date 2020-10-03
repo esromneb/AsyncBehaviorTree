@@ -15,6 +15,7 @@ const testForceFailure2 = require("./btrees/testForceFailure2.xml");
 const testForceSuccess = require("./btrees/testForceSuccess.xml");
 const testRepeat = require("./btrees/testRepeat.xml");
 const testRepeatVar = require("./btrees/testRepeatVar.xml");
+const testRetry = require("./btrees/testRetry.xml");
 
 
 const util = require('util');
@@ -407,5 +408,74 @@ test("Test Helper works ", async function(done) {
 
   done();
 
+});
+
+
+
+
+test("Test retry until successful", async function(done) {
+
+
+  for(let i = 0; i < 5; i++ ) {
+
+    let helper = new Blackboard1Parent();
+
+    debugger;
+    let dut = new AsyncBehaviorTree(testRetry, helper.blackBoard);
+
+
+    let called = 0;
+
+    helper.blackBoard.go1 = ()=>{
+      helper.blackBoard.called.push('go1');
+
+      if( called >= i ) {
+        return true;
+      }
+
+      called++;
+
+      // return true;
+      return false;
+    };
+
+
+    let print: boolean = false;
+    dut.printCall = false;
+    dut.printParse = false;
+
+    // if( i == 3 ) {
+    //   dut.printCall = true;
+    // }
+
+    helper.reset();
+
+    await dut.execute();
+
+    if( print ) {
+      console.log('called:', helper.blackBoard.called);
+    }
+
+    switch(i) {
+      case 0:
+        expect(helper.blackBoard.called).toStrictEqual(['go1','go2','go3']);
+        break;
+      case 1:
+        expect(helper.blackBoard.called).toStrictEqual(['go1','go1','go2','go3']);
+        break;
+      case 2:
+        expect(helper.blackBoard.called).toStrictEqual(['go1','go1','go1','go2','go3']);
+        break;
+      case 3:
+      case 4:
+        expect(helper.blackBoard.called).toStrictEqual(['go1','go1','go1']);
+        break;
+    }
+
+  }
+
+
+
+  done();
 });
 
