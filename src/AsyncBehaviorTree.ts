@@ -285,7 +285,22 @@ class AsyncBehaviorTree {
       return false;
     }
 
-    const lookup = rawTrimmed.slice(2,rawTrimmed.length-1);
+    let lookup = rawTrimmed.slice(2,rawTrimmed.length-1);
+
+    const typed = lookup.split(':');
+
+    let doType = false;
+
+    if( typed.length === 2 ) {
+      // found exactly one :
+
+      // using the length of the first argument
+      // trim off the conversion
+      lookup = lookup.slice(0,typed[0].length);
+
+      // set a flag for below
+      doType = true;
+    }
 
     // istanbul ignore if
     if( this.printCall ) {
@@ -317,7 +332,12 @@ class AsyncBehaviorTree {
       return false;
     }
 
-    unpack[ls[i]] = value;
+    if( doType ) {
+      unpack[ls[i]] = this.doTypeConversion(typed[1], value);
+    } else {
+      unpack[ls[i]] = value;
+    }
+
 
     return true;
   }
