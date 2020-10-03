@@ -49,6 +49,7 @@
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
+    "is2": "^2.0.6",
     "xml2js": "^0.4.23"
   }
 }

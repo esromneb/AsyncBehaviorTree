@@ -25,10 +25,8 @@ class Blackboard1Parent {
       stay1:  ()=>{that.blackBoard.called.push('stay1');  return 'stay1'  in that.fail ? false : true},
       stay2:  ()=>{that.blackBoard.called.push('stay2');  return 'stay2'  in that.fail ? false : true},
       cIName: ()=>{that.blackBoard.called.push('cIName'); return 'cIName' in that.fail ? false : true},
-      isFull: true,
-      valueA: 0,
-      valueB: 1,
-      valueC: 2
+
+      
     }
 
     // for good measure
@@ -36,12 +34,27 @@ class Blackboard1Parent {
   }
 
   reset() {
+    let b = this.blackBoard;
     this.fail = {};
-    this.blackBoard.called = [];
-    this.blackBoard.isFull = true;
-    this.blackBoard.valueA = 0;
-    this.blackBoard.valueB = 1;
-    this.blackBoard.valueC = 2;
+    b.called = [];
+    b.isFull = true;
+    b.valueA = 0;
+    b.valueB = 1;
+    b.valueC = 2;
+    b.valueD = 1.1;
+    b.valueE = 3.14;
+    b.valueF = -3.14;
+    b.valueG = -1;
+    b.valueH = -20;
+    b.valueI = 'hello';
+    b.valueJ = {a:true,b:0,c:'bye',d:1.1,e:-3.14,f:'true',g:'false'};
+    b.valueK = '4';
+    b.valueL = '0';
+    b.valueM = '-1';
+    b.valueN = '1';
+    b.valueO = 'true';
+    b.valueP = 'false';
+
 
   }
 }

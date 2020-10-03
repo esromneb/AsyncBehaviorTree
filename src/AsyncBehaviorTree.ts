@@ -1,5 +1,6 @@
 var xml2js = require('xml2js');
 const merge = require('deepmerge');
+const is2 = require('is2');
 
 export interface IExecuteTreeArgs {
   [name: string]: string;
@@ -23,6 +24,10 @@ export interface ABTZmqLogger {
 
 export interface IFunctionWriterCb {
     (buf: Uint8Array): void;
+}
+
+export interface IConversionFunction {
+    (tout: string, vin: any, is: any): any;
 }
 
 
@@ -132,6 +137,8 @@ class AsyncBehaviorTree {
 
     this.rawXml = xml;
     parser.parseString(xml, this.parseResults.bind(this));
+
+    this.regsiterBuiltInTypeConversions();
   }
 
   destroy(): void {
@@ -168,6 +175,41 @@ class AsyncBehaviorTree {
     }
   }
 
+  private regsiterBuiltInTypeConversions(): void {
+
+    this.registerTypeConversion('s', (tout, vin, is)=>{
+      return '' + vin;
+    });
+
+    this.registerTypeConversion('f', (tout, vin, is)=>{
+      return parseFloat(vin);
+    });
+
+  }
+
+  typeConvert: any = {};
+
+  registerTypeConversion(tout: string, cb: IConversionFunction) {
+    // istanbul ignore if
+    if( tout in this.typeConvert ) {
+      throw new Error(`Error: can't register type conversion for ${tout}, it already exists`);
+    }
+
+    this.typeConvert[tout] = cb;
+  }
+
+  // tout is the type we are requesting out
+  // vin is the value in
+  doTypeConversion(tout: string, vin: any): any {
+    if( !(tout in this.typeConvert) ) {
+      this.warning(`Unknown conversion suffix :${tout}`);
+      return vin;
+    }
+
+    return this.typeConvert[tout](tout, vin, is2);
+  }
+
+  // looks for ${}
   scanForVariable(trimmed: string): boolean {
     if(trimmed.charAt(0) === '$' && trimmed.charAt(1) === '{' && trimmed.charAt(trimmed.length-1) === '}') {
       return true;
@@ -176,7 +218,7 @@ class AsyncBehaviorTree {
     }
   }
 
-  // looks for {} values in nodes
+  // looks for ${} values in nodes
   // these values are loaded from the board
   // if no {} are found the original rawValue is returned
   // spaces are trimmed from the value before checking for {} in case of a mistaked space in the GUI
@@ -189,7 +231,22 @@ class AsyncBehaviorTree {
       return rawValue;
     }
 
-    const lookup = rawTrimmed.slice(2,rawTrimmed.length-1);
+    let lookup = rawTrimmed.slice(2,rawTrimmed.length-1);
+
+    const typed = lookup.split(':');
+
+    let doType = false;
+
+    if( typed.length === 2 ) {
+      // found exactly one :
+
+      // using the length of the first argument
+      // trim off the conversion
+      lookup = lookup.slice(0,typed[0].length);
+
+      // set a flag for below
+      doType = true;
+    }
 
     // istanbul ignore if
     if( this.printCall ) {
@@ -197,8 +254,6 @@ class AsyncBehaviorTree {
     }
 
     const ls = lookup.split('.');
-
-    // console.log(ls);
 
     let unpack = this.bb;
 
@@ -212,7 +267,11 @@ class AsyncBehaviorTree {
       unpack = unpack[layer]
     }
 
-    return unpack;
+    if( doType ) {
+      return this.doTypeConversion(typed[1], unpack);
+    } else {
+      return unpack;
+    }
   }
 
   // returns true if successful
@@ -515,6 +574,7 @@ class AsyncBehaviorTree {
     const loaded = this.detectAndLoadBraceValues(rawValue);
     const worked = this.detectAndStoreBraceValues(rawValue2, loaded);
 
+    // istanbul ignore if
     if( !worked ) {
       this.warning(`handleSetBlackboard node '${node.path}' tried to use the string '${rawValue}' as a destination variable`);
     }
