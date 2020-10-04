@@ -80,6 +80,7 @@ const plannedSupport = {
   'blackboardcheckstring': true,
   'timeout': true,
   'subtree': true,
+  'delay': true,
   'subtreeplus': false,
   'reactivefallback': false,
   'reactivesequence': false,

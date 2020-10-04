@@ -29,6 +29,7 @@ Action
 SubTree
 SubTreePlus
 Delay
+Condition
 
 
 
@@ -64,3 +65,4 @@ action
 subtree
 subtreeplus
 delay
+condition

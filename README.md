@@ -30,13 +30,136 @@ This app suports a subset of node that Groot supports.  As of today I'm not sure
   <td><pre lang="diff">+ Supported</pre>
 </tr>
 <tr>
-  <td>Switch2</td>
+  <td><b>Fallback</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>Inverter</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>ForceSuccess</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>Action</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>Condition</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>AlwaysFailure</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>AlwaysSuccess</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>ForceFailure</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>Repeat</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>SetBlackboard</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td><b>RetryUntilSuccesful</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+
+
+<tr>
+  <td><b>KeepRunningUntilFailure</b></td>
   <td><pre lang="diff">! Plan To Support</pre>
 </tr>
 <tr>
-  <td>Parallel</td>
+  <td><b>Switch2</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>Switch3</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>Switch4</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>Switch5</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>Switch6</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>BlackboardCheckDouble</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>BlackboardCheckInt</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>BlackboardCheckString</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>Timeout</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>SubTree</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td><b>Delay</b></td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+
+
+
+
+<tr>
+  <td><b>SubTreePlus</b></td>
   <td><pre lang="diff">- Will Not Support</pre>
 </tr>
+<tr>
+  <td><b>ReactiveFallback</b></td>
+  <td><pre lang="diff">- Will Not Support</pre>
+</tr>
+<tr>
+  <td><b>ReactiveSequence</b></td>
+  <td><pre lang="diff">- Will Not Support</pre>
+</tr>
+<tr>
+  <td><b>IfThenElse</b></td>
+  <td><pre lang="diff">- Will Not Support</pre>
+</tr>
+<tr>
+  <td><b>ManualSelector</b></td>
+  <td><pre lang="diff">- Will Not Support</pre>
+</tr>
+<tr>
+  <td><b>SequenceStar</b></td>
+  <td><pre lang="diff">- Will Not Support</pre>
+</tr>
+<tr>
+  <td><b>Parallel</b></td>
+  <td><pre lang="diff">- Will Not Support</pre>
+</tr>
+<tr>
+  <td><b>WhileDoElse</b></td>
+  <td><pre lang="diff">- Will Not Support</pre>
+</tr>
+
 </thead>
 </table>
 
