@@ -22,8 +22,8 @@ This app suports a subset of node that Groot supports.  As of today I'm not sure
 <table>
 <thead>
 <tr>
-<th>abc</th>
-<th>def</th>
+<th>Node Type</th>
+<th>Support Status</th>
 </tr>
 <tr>
   <td><b>Sequence</b></td>
@@ -162,10 +162,6 @@ This app suports a subset of node that Groot supports.  As of today I'm not sure
 
 </thead>
 </table>
-
-```json
-{"A":4}
-```
 
 
 # Internals
