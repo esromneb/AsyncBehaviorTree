@@ -16,6 +16,12 @@ By default, functions expect a single argument which is a object with keys.  The
 
 Functions can be called with normal arguments. To do this name the inputs like `_in_0` and `_in_1` in the Groot Action notes.
 
+# Note Type Support
+This app suports a subset of node that Groot supports.  As of today I'm not sure how to make "reactive" node types work.  For this reason I've skipped them.
+
+|  Name       |  Status        |
+|-------------|----------------|
+|             |                |
 
 
 # Internals
