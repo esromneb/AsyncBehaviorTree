@@ -19,9 +19,30 @@ Functions can be called with normal arguments. To do this name the inputs like `
 # Note Type Support
 This app suports a subset of node that Groot supports.  As of today I'm not sure how to make "reactive" node types work.  For this reason I've skipped them.
 
-|  Name       |  Status        |
-|-------------|----------------|
-|             |                |
+<table>
+<thead>
+<tr>
+<th>abc</th>
+<th>def</th>
+</tr>
+<tr>
+  <td><b>Sequence</b></td>
+  <td><pre lang="diff">+ Supported</pre>
+</tr>
+<tr>
+  <td>Switch2</td>
+  <td><pre lang="diff">! Plan To Support</pre>
+</tr>
+<tr>
+  <td>Parallel</td>
+  <td><pre lang="diff">- Will Not Support</pre>
+</tr>
+</thead>
+</table>
+
+```json
+{"A":4}
+```
 
 
 # Internals
