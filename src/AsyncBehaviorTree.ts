@@ -26,24 +26,34 @@ export interface IFunctionWriterCb {
     (buf: Uint8Array): void;
 }
 
+export interface IJsonFunctionWriterCb {
+  (str: string): void;
+}
+
 export interface IConversionFunction {
     (tout: string, vin: any, is: any): any;
 }
 
+export interface ABTLoggerBase {
+  logTransition(uid: number, prev_status: number, status: number): void;
+  getNameForUID(u: number): string;
+  getForPath(path: string): number;
+  parseXML(xml: string): void;
+}
 
-export interface ABTLogger {
+export interface ABTWasmLogger extends ABTLoggerBase {
   start(): Promise<void>;
   reset(): void;
   setFilePath(path: string): Promise<void>;
-  parseXML(xml: string): void;
   registerActionNodes(ns: string[]): void;
   registerConditionNodes(ns: string[]): void;
-  logTransition(uid: number, prev_status: number, status: number): void;
-  logTransitionDuration(uid: number, prev_status: number, status: number, duration_ms: number): void;
-  getNameForUID(u: number): string;
-  getForPath(path: string): number;
   getForPathArray(ps: number[]): number;
   writeToCallback(cb: IFunctionWriterCb): void;
+}
+
+export interface ABTJsonLogger extends ABTLoggerBase {
+  writeJsonToCallback(cb: IJsonFunctionWriterCb): void;
+  preWalkTree(cb: any): void;
 }
 
 
@@ -1390,20 +1400,20 @@ class AsyncBehaviorTree {
 
   // transition logger
   // not a text logger
-  logger: ABTLogger;
+  logger: ABTLoggerBase;
 
   logPath: string;
 
-  async setFileLogger(l: ABTLogger, path: string): Promise<void> {
+  async setFileLogger(l: ABTWasmLogger, path: string): Promise<void> {
     this.logger = l;
 
-    await this.logger.start();
-    await this.logger.setFilePath(path);
+    await l.start();
+    await l.setFilePath(path);
     this.logPath = path;
 
-    this.logger.registerActionNodes(this.getActionNodes());
-    this.logger.registerConditionNodes(this.getConditionNodes());
-    this.logger.parseXML(this.rawXml);
+    l.registerActionNodes(this.getActionNodes());
+    l.registerConditionNodes(this.getConditionNodes());
+    l.parseXML(this.rawXml);
 
     this.writeNodeUID();
   }
@@ -1413,25 +1423,46 @@ class AsyncBehaviorTree {
 
 
   // istanbul ignore next
-  async setZmqLogger(l: any, z: ABTZmqLogger): Promise<void> {
+  async setZmqLogger(l: ABTWasmLogger, z: ABTZmqLogger): Promise<void> {
     this.logger = l;
     this.zmq = z;
 
-    await this.logger.start(); // FIXME
+    await l.start(); // FIXME
 
     this.zmqTransitions = 0;
-    this.logger.writeToCallback(this.zmqGotTransition.bind(this));
+    l.writeToCallback(this.zmqGotTransition.bind(this));
 
 
-    await this.logger.start(); // FIXME
-    this.logger.registerActionNodes(this.getActionNodes());
-    this.logger.registerConditionNodes(this.getConditionNodes());
-    this.logger.parseXML(this.rawXml);
+    await l.start(); // FIXME
+    l.registerActionNodes(this.getActionNodes());
+    l.registerConditionNodes(this.getConditionNodes());
+    l.parseXML(this.rawXml);
 
     this.writeNodeUID();
   }
 
   zmqTransitions: number = 0;
+
+  async setJsonLogger(l: ABTJsonLogger): Promise<void> {
+    this.logger = l;
+
+    l.parseXML(this.rawXml);
+
+    // the json logger does not have access to the wasm
+    // this means that we need to choose unique id's
+    // for each node without having access to wasm
+    // in order to do this we feed all of the nodes in
+    // during the pre phase.  This gives the logger
+    // a preview of all the node paths
+    // then below when we call writeNodeUID we can
+    // guarentee a unique ID for each path without wasm
+    // when the json logger sends data over the WS to
+    // the server, these ids will be translated
+    this.walkTree(l.preWalkTree.bind(l));
+
+    this.writeNodeUID();
+
+  }
 
   // istanbul ignore next
   private zmqGotTransition(buf: Uint8Array) {
