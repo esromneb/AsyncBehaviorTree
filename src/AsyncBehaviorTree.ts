@@ -1417,13 +1417,13 @@ class AsyncBehaviorTree {
     this.logger = l;
     this.zmq = z;
 
-    await this.logger.start();
+    await this.logger.start(); // FIXME
 
     this.zmqTransitions = 0;
     this.logger.writeToCallback(this.zmqGotTransition.bind(this));
 
 
-    await this.logger.start();
+    await this.logger.start(); // FIXME
     this.logger.registerActionNodes(this.getActionNodes());
     this.logger.registerConditionNodes(this.getConditionNodes());
     this.logger.parseXML(this.rawXml);

@@ -177,6 +177,10 @@ test("Test testForceFailure 2", async function(done) {
 
   let dut = this.bt = new AsyncBehaviorTree(testForceFailure2, helper.blackBoard);
 
+  // dut.walkTree((node)=>{
+  //   console.log(node.path, node,"\n");
+  // })
+
   dut.printCall = false;
   dut.printParse = false;
 
@@ -263,6 +267,10 @@ test("Test repeat", async function(done) {
   let dut = new AsyncBehaviorTree(testRepeat, helper.blackBoard);
 
   // console.log(util.inspect(dut.exe,{depth:null,colors:true}));
+
+  // dut.walkTree((node)=>{
+  //   console.log(node);
+  // })
 
 
 
