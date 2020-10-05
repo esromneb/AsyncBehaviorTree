@@ -66,21 +66,6 @@ test("Test AlwaysSuccess", async function(done) {
 
   let print: boolean = false;
 
-
-  // const expected = ['go1'];
-
-
-  let expectedStop = {
-    '1':1,
-    '2':2,
-    '3':3,
-    '4':4,
-    '5':5,
-    '6':6,
-    '7':7,
-    '8':8,
-  }
-
   let helper = new Blackboard1Parent();
 
   let dut = this.bt = new AsyncBehaviorTree(testSuccess, helper.blackBoard);
@@ -88,26 +73,13 @@ test("Test AlwaysSuccess", async function(done) {
   dut.printCall = false;
   dut.printParse = false;
 
-
   helper.reset();
-
 
   await dut.execute();
 
-  // console.log(helper.blackBoard.called);
-
-    // if( print ) {
-    //   console.log('called', helper.blackBoard.called);
-    // }
-
-    // let thisExpected = expected.slice(0,expectedStop[stop]);
-
   expect(helper.blackBoard.called).toStrictEqual(['go1','go2']);
-  // }
-
 
   done();
-
 });
 
 
