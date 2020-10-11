@@ -187,6 +187,8 @@ test("Test AlwaysFailure", async function(done) {
 
   helper.reset();
 
+  helper.fail['OpenDoor'] = true;
+
   await dut.execute();
 
   // console.log(helper.blackBoard.called);
