@@ -11,7 +11,7 @@ const testT05 = require("./btrees/t05CrossdoorNoSubtree.xml");
 
 const util = require('util');
 
-
+// https://stackoverflow.com/questions/9781218/how-to-change-node-jss-console-font-color
 let color = {
 'Reset' : "\x1b[0m",
 'Bright' : "\x1b[1m",
@@ -79,9 +79,12 @@ class MockAsyncBehaviorTreeJsonLogger implements ABTJsonLogger{
     const p = this.colorNameForStatus[prev_status];
     const s = this.colorNameForStatus[status];
 
+    let len = p.length + s.length;
+
+
 
     if(this.options.print || true) {
-      console.log(`${name.padEnd(26,' ')} ${p} -> ${s}`);
+      console.log(`${name.padEnd(26,' ')} ${p} -> ${s}      ${path.padStart(40-len+path.length, ' ')}`);
     }
     this.transitionCount++;
   }
