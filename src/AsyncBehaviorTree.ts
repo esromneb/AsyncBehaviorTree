@@ -875,7 +875,7 @@ class AsyncBehaviorTree {
         if( !earlyFallback && types[ptr] === 'fallback' ) {
           const anySaved = anypass[ptr];
           popLevel(true);
-          this.logTransition(this.getNodeParent(node), true, true);
+          // this.logTransition(this.getNodeParent(node), true, true);
           if( anySaved ) {
             // we got at least 1 pass in our fallback, just move on
           } else {
