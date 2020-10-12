@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="MainTree">
+        <Sequence name="SeqA">
+            <Fallback name="root_Fallback">
+                <Sequence name="SeqB">
+                    <Action ID="PassThroughWindow"/>
+                    <Sequence name="SeqC">
+                        <Action ID="PassThroughWindow"/>
+                        <Action ID="PassThroughWindow"/>
+                        <Sequence name="SeqD">
+                            <Action ID="PassThroughWindow"/>
+                            <Action ID="PassThroughWindow"/>
+                            <Action ID="PassThroughWindow"/>
+                            <Action ID="PassThroughDoor"/>
+                        </Sequence>
+                    </Sequence>
+                </Sequence>
+                <Sequence name="SeqE">
+                    <Action ID="PassThroughWindow"/>
+                    <Sequence name="SeqF">
+                        <Action ID="PassThroughWindow"/>
+                        <Sequence name="SeqG">
+                            <Action ID="PassThroughWindow"/>
+                        </Sequence>
+                        <Action ID="PassThroughWindow"/>
+                    </Sequence>
+                    <Action ID="PassThroughWindow"/>
+                </Sequence>
+            </Fallback>
+            <Action ID="CloseDoor"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="CloseDoor"/>
+        <SubTree ID="DoorClosed"/>
+        <Condition ID="IsDoorOpen"/>
+        <Action ID="OpenDoor"/>
+        <Action ID="PassThroughDoor"/>
+        <Action ID="PassThroughWindow"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+
