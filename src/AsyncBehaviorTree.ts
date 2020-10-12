@@ -852,9 +852,22 @@ class AsyncBehaviorTree {
       }
 
       // if we are empty we need to decide pop behavior
-      while( (ptr > 0 && pending[ptr].length == 0) ) {
+      while( (ptr > 0 && pending[ptr].length == 0) || (ptr >= 0 && types[ptr] === 'fallback') ) {
+
+        const earlyFallback = (ptr >= 0 && types[ptr] === 'fallback') && pending[ptr].length !== 0;
+
+        if( earlyFallback ) {
+          const anySaved = anypass[ptr];
+          if( anySaved ) {
+            popLevel(true);
+            continue;
+          } else {
+            break;
+          }
+        }
+
         // debugger;
-        if( types[ptr] === 'fallback' ) {
+        if( !earlyFallback && types[ptr] === 'fallback' ) {
           const anySaved = anypass[ptr];
           popLevel(true);
           this.logTransition(this.getNodeParent(node), true, true);
@@ -899,7 +912,10 @@ class AsyncBehaviorTree {
           failUp(node);
         } else {
           // istanbul ignore next
-          throw new Error(`Unknown types in finish pending: ${types[ptr]}`);
+          if( !earlyFallback ) {
+            // istanbul ignore next
+            throw new Error(`Unknown types in finish pending: ${types[ptr]}`);
+          }
         }
         // break; // uncomment to cause issue #35
       }

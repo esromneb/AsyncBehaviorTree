@@ -58,7 +58,7 @@ test("test undefined node 1", async function(done) {
   let expectedStop = {
     '1':1,
     '2':3,
-    '3':3,
+    '3':2,
   }
 
 
@@ -74,7 +74,7 @@ test("test undefined node 1", async function(done) {
   if( print ) {
     console.log(blackBoard.called);
   }
-  expect(blackBoard.called).toStrictEqual(expected);
+  expect(blackBoard.called).toStrictEqual(expected.slice(0,2));
 
    // we have our expected order of called functions above
   // we used the expectedStop to mark one of the functions as failing
@@ -224,11 +224,11 @@ test("test undefined node 4", async function(done) {
   let expectedStop = {
     '1':1,
     '2':2,
-    '3':7,
-    '4':7,
-    '5':7,
-    '6':6,
-    '7':7,
+    '3':4,
+    '4':3,
+    '5':3,
+    '6':3,
+    '7':3,
     // '2':2,
     // '3':3,
   }
@@ -244,7 +244,7 @@ test("test undefined node 4", async function(done) {
   await dut.execute();
 
   // console.log(blackBoard.called);
-  expect(blackBoard.called).toStrictEqual(expected);
+  expect(blackBoard.called).toStrictEqual(expected.slice(0,3));
 
    // we have our expected order of called functions above
   // we used the expectedStop to mark one of the functions as failing
