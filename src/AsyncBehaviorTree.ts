@@ -636,6 +636,7 @@ class AsyncBehaviorTree {
     const anypass: boolean[] = [];
     const meta: any[] = [];
     const hist: any[] = [];
+    const visited: any[] = [];
     let ptr = -1;
 
     const idleHistory = (): void => {
@@ -646,16 +647,35 @@ class AsyncBehaviorTree {
       hist[ptr] = [];
     }
 
+    const idleHistoryUp = (success: boolean): void => {
+      idleHistory();
+      debugger;
+      let ptr2 = ptr;
+
+      while(ptr2 >= 0 && pending[ptr2].length == 0) {
+        for(let n of hist[ptr2-1]) {
+          this.logTransition2(n, success?2:3);
+        }
+        hist[ptr2] = [];
+
+        ptr2--;
+      }
+    }
+
     const popLevel = (success: boolean): void => {
+      // idleHistoryUp(success);
+
       pending.pop();
       types.pop();
       anypass.pop();
       meta.pop();
 
-      idleHistory();
+      
       hist.pop();
 
+
       ptr--;
+
     }
 
     const failUp = (og: any): void => {
@@ -732,6 +752,8 @@ class AsyncBehaviorTree {
         node = collection.shift();
       }
 
+      visited.push(node);
+
       // istanbul ignore if
       if(node == undefined) {
         throw new Error(`node cannot be undefined here`);
@@ -749,6 +771,8 @@ class AsyncBehaviorTree {
 
         if( ptr >= 0 ) {
           hist[ptr].push(node);
+        } else {
+          console.log("skipping pushing", node);
         }
 
         ptr++;
@@ -769,6 +793,10 @@ class AsyncBehaviorTree {
         } else if( node.w === 'retryuntilsuccesful' ) {
           meta[ptr].retry = parseInt(this.detectAndLoadBraceValues(node.args.num_attempts), 10);
         }
+
+        // if( node.path === '0.1') {
+        //   debugger;
+        // }
 
         pending[ptr].unshift(...node.seq);
 
@@ -792,12 +820,12 @@ class AsyncBehaviorTree {
           return;
         }
 
-        if( node.path === '0.0.1.1.0') {
-          // console.log(types[ptr], '---');
-          // debugger;
+        if( node.path === '0.1') {
+          debugger;
         }
         
         this.logTransition2(node, res?2:3);
+
 
         if( res ) {
           anypass[ptr] = true;
@@ -857,11 +885,12 @@ class AsyncBehaviorTree {
       }
 
       // if we are empty we need to decide pop behavior
-      while( (ptr > 0 && pending[ptr].length == 0) || (ptr >= 0 && types[ptr] === 'fallback') ) {
+      while( (ptr > 0 && pending[ptr].length == 0) || (ptr >= 0 && types[ptr] === 'fallback' && anypass[ptr]) ) {
 
-        const earlyFallback = (ptr >= 0 && types[ptr] === 'fallback') && pending[ptr].length !== 0;
+        const earlyFallback = (ptr >= 0 && types[ptr] === 'fallback' && anypass[ptr]) && pending[ptr].length !== 0;
 
         if( earlyFallback ) {
+          debugger;
           const anySaved = anypass[ptr];
           if( anySaved ) {
             popLevel(true);
@@ -873,8 +902,10 @@ class AsyncBehaviorTree {
 
         // debugger;
         if( !earlyFallback && types[ptr] === 'fallback' ) {
+          debugger;
           const anySaved = anypass[ptr];
           popLevel(true);
+          console.log(this.getNodeParent(node));
           // this.logTransition(this.getNodeParent(node), true, true);
           if( anySaved ) {
             // we got at least 1 pass in our fallback, just move on
@@ -893,8 +924,9 @@ class AsyncBehaviorTree {
             // this.logTransition(node, true, false);
           }
         } else if( types[ptr] === 'sequence' || types[ptr] === 'forcesuccess' ) {
+          debugger;
           popLevel(true);
-          this.logTransition(this.getNodeParent(node), true, true);
+          // this.logTransition(this.getNodeParent(node), true, true);
           // we are popping a sequence if we get here the sequence succeded
           // we must mark anypass as true for the new level for #35 (part 2)
           anypass[ptr] = true;
@@ -1611,6 +1643,10 @@ class AsyncBehaviorTree {
   private logTransition(node: any, pop: boolean, result?: boolean): void {
     if( !this.logger ) {
       return;
+    }
+
+    if( node.path === '0.0.1' ) {
+      debugger;
     }
 
     let prev = this.prevNodeState[node.path];

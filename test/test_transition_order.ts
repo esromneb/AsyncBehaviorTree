@@ -9,6 +9,8 @@ BlackboardT05Parent
 } from "./helpers/BlackboardT05Parent";
 const testT05 = require("./btrees/t05CrossdoorNoSubtree.xml");
 const testT05_3 = require("./btrees/t05Crossdoor3.xml");
+const testT05_4 = require("./btrees/t05Crossdoor4.xml");
+const testT05_5 = require("./btrees/t05Crossdoor5.xml");
 
 const util = require('util');
 
@@ -236,7 +238,7 @@ test.skip("Test t05 log", async function(done) {
 });
 
 
-function force2(currentNodeId: number, hn:string): string {
+function force3(currentNodeId: number, hn:string): string {
 
   switch(this.currentNodeId) {
     case 100:
@@ -253,6 +255,15 @@ function force2(currentNodeId: number, hn:string): string {
       break;
     case 107:
       hn = 'SeqD';
+      break;
+    case 112:
+      hn = 'SeqE';
+      break;
+    case 114:
+      hn = 'SeqF';
+      break;
+    case 116:
+      hn = 'SeqG';
       break;
   }
 
@@ -330,7 +341,7 @@ SUCCESS -> IDLE
 
 
 
-test("Test t05 log 3", async function(done) {
+test.skip("Test t05 log 3", async function(done) {
 
 
   let print: boolean = false;
@@ -344,12 +355,12 @@ test("Test t05 log 3", async function(done) {
   dut.printParse = false;
 
 
-  let jut = new MockAsyncBehaviorTreeJsonLogger(force2, {print, printTransitions: true});
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force3, {print, printTransitions: true});
   dut.setJsonLogger(jut);
 
   jut.setVerifyTransitions(expectedTransitions3);
 
-  jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
+  // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
 
 
   helper.reset();
@@ -374,3 +385,146 @@ test("Test t05 log 3", async function(done) {
 
 });
 
+
+
+
+
+function force4(currentNodeId: number, hn:string): string {
+
+  switch(this.currentNodeId) {
+    case 100:
+      hn = 'SeqA';
+      break;
+    case 101:
+      hn = 'root_Fallback';
+      break;
+    case 102:
+      hn = 'SeqB';
+      break;
+    case 104:
+      hn = 'SeqE';
+      break;
+    // case 107:
+    //   hn = 'SeqD';
+    //   break;
+    // case 112:
+    //   hn = 'SeqE';
+    //   break;
+    // case 114:
+    //   hn = 'SeqF';
+    //   break;
+    // case 116:
+    //   hn = 'SeqG';
+    //   break;
+  }
+
+  return hn;
+}
+
+
+
+
+
+
+
+
+test.skip("Test t05 log 4", async function(done) {
+  let print: boolean = false;
+
+  let helper = new BlackboardT05Parent();
+
+  let dut = new AsyncBehaviorTree(testT05_4, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force4, {print, printTransitions: true});
+  dut.setJsonLogger(jut);
+
+  // jut.setVerifyTransitions(expectedTransitions3);
+  // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
+
+
+  helper.reset();
+
+  helper.fail['OpenDoor'] = true;
+  helper.fail['PassThroughDoor'] = true;
+
+  await dut.execute();
+
+  done();
+});
+
+
+
+
+
+
+
+function force5(currentNodeId: number, hn:string): string {
+
+  switch(this.currentNodeId) {
+    case 100:
+      hn = 'SeqA';
+      break;
+    case 101:
+      hn = 'root_Fallback';
+      break;
+    case 102:
+      hn = 'SeqB';
+      break;
+    case 104:
+      hn = 'SeqE';
+      break;
+    // case 107:
+    //   hn = 'SeqD';
+    //   break;
+    // case 112:
+    //   hn = 'SeqE';
+    //   break;
+    // case 114:
+    //   hn = 'SeqF';
+    //   break;
+    // case 116:
+    //   hn = 'SeqG';
+    //   break;
+  }
+
+  return hn;
+}
+
+
+
+
+
+
+
+
+test("Test t05 log 5", async function(done) {
+  let print: boolean = false;
+
+  let helper = new BlackboardT05Parent();
+
+  let dut = new AsyncBehaviorTree(testT05_5, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true});
+  dut.setJsonLogger(jut);
+
+  // jut.setVerifyTransitions(expectedTransitions3);
+  // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
+
+
+  helper.reset();
+
+  helper.fail['OpenDoor'] = true;
+  helper.fail['PassThroughDoor'] = true;
+
+  await dut.execute();
+
+  done();
+});
