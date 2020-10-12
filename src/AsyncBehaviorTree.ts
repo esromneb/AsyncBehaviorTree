@@ -614,6 +614,21 @@ class AsyncBehaviorTree {
     return true;
   }
 
+  // is there a node to the right at the same depth/level of the tree
+  // (note a parallel tree of the same depth but with a different parent doesn't count)
+  pathHasRightSibling(path: string): boolean {
+
+    let ps = this.arrayForPath(path);
+
+    ps[ps.length-1]++;
+
+    let path2 = this.pathForArray(ps);
+
+    let valid = !!this.accessNodeByPath(path2);
+
+    return valid;
+  }
+
   // see https://medium.com/@kenny.hom27/breadth-first-vs-depth-first-tree-traversal-in-javascript-48df2ebfc6d1#fe0b
   // this is a DFS through the behavior tree (this.exe)
   // we save the current level into the pending[]
@@ -637,6 +652,7 @@ class AsyncBehaviorTree {
     const meta: any[] = [];
     const hist: any[] = [];
     const visited: any[] = [];
+    let notifyVisited = -1;
     let ptr = -1;
 
     const idleHistory = (): void => {
@@ -647,30 +663,90 @@ class AsyncBehaviorTree {
       hist[ptr] = [];
     }
 
-    const idleHistoryUp = (success: boolean): void => {
-      idleHistory();
-      debugger;
-      let ptr2 = ptr;
+    // const idleHistoryUp = (success: boolean): void => {
+    //   idleHistory();
+    //   debugger;
+    //   let ptr2 = ptr;
 
-      while(ptr2 >= 0 && pending[ptr2].length == 0) {
-        for(let n of hist[ptr2-1]) {
-          this.logTransition2(n, success?2:3);
+    //   while(ptr2 >= 0 && pending[ptr2].length == 0) {
+    //     for(let n of hist[ptr2-1]) {
+    //       this.logTransition2(n, success?2:3);
+    //     }
+    //     hist[ptr2] = [];
+
+    //     ptr2--;
+    //   }
+    // }
+
+    const idleVisited = (success: boolean): void => {
+      let pp = visited.map(x=>x.path);
+      let rs = visited.map(x=>this.pathHasRightSibling(x.path));
+      let depth = pp.map(x=>this.arrayForPath(x).length);
+      // console.log(pp);
+      // console.log(depth);
+      // console.log('');
+
+      let startDepth = depth[depth.length-1];
+      // console.log(rs);
+      // console.log(pending.map(x=>x.length));
+
+      let doomed = [];
+
+      let trueFound = 0;
+
+      let needIdle = [];
+      let needSuccess = [];
+
+      for(let i = rs.length-1; i >= 0; i--) {
+        // if( rs[i] ) {
+
+
+        //   break;
+        // } else {
+        // }
+
+        if( depth[i] === startDepth) {
+          // if( i > notifyVisited ) {
+            // this.logTransition2(visited[i], 0);
+
+            needIdle.push(visited[i]);
+
+            visited.splice(i, 1);
+
+            // doomed.push(visited[i])
+
+            // notifyVisited = Math.max(notifyVisited, i);
+          // }
+
+        } else {
+          // this.logTransition2(visited[i], success?2:3);
+          needSuccess.push(visited[i]);
+          break;
         }
-        hist[ptr2] = [];
 
-        ptr2--;
       }
+
+      needIdle.reverse();
+      for(let ne of needIdle) {
+        this.logTransition2(ne, 0);
+      }
+
+      for(let ns of needSuccess) {
+        this.logTransition2(ns, success?2:3);
+      }
+      // console.log('');
+
     }
 
     const popLevel = (success: boolean): void => {
       // idleHistoryUp(success);
-
+      debugger;
+      idleVisited(success);
       pending.pop();
       types.pop();
       anypass.pop();
       meta.pop();
 
-      
       hist.pop();
 
 
@@ -772,7 +848,7 @@ class AsyncBehaviorTree {
         if( ptr >= 0 ) {
           hist[ptr].push(node);
         } else {
-          console.log("skipping pushing", node);
+          console.log("skipping pushing", node.path);
         }
 
         ptr++;
@@ -905,7 +981,7 @@ class AsyncBehaviorTree {
           debugger;
           const anySaved = anypass[ptr];
           popLevel(true);
-          console.log(this.getNodeParent(node));
+          // console.log(this.getNodeParent(node));
           // this.logTransition(this.getNodeParent(node), true, true);
           if( anySaved ) {
             // we got at least 1 pass in our fallback, just move on

@@ -358,7 +358,7 @@ test.skip("Test t05 log 3", async function(done) {
   let jut = new MockAsyncBehaviorTreeJsonLogger(force3, {print, printTransitions: true});
   dut.setJsonLogger(jut);
 
-  jut.setVerifyTransitions(expectedTransitions3);
+  // jut.setVerifyTransitions(expectedTransitions3);
 
   // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
 
@@ -469,7 +469,7 @@ function force5(currentNodeId: number, hn:string): string {
       hn = 'SeqA';
       break;
     case 101:
-      hn = 'root_Fallback';
+      hn = 'Sequence';
       break;
     case 102:
       hn = 'SeqB';
@@ -498,9 +498,39 @@ function force5(currentNodeId: number, hn:string): string {
 
 
 
+const expectedTransitions5 = `
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+`;
 
 
 
+
+// First one I got working
+// however as of now it's short due to shenanigans with the ptr = -1
+// stuff.  I need a way to fix this without affecting call order
 test("Test t05 log 5", async function(done) {
   let print: boolean = false;
 
@@ -515,7 +545,7 @@ test("Test t05 log 5", async function(done) {
   let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true});
   dut.setJsonLogger(jut);
 
-  // jut.setVerifyTransitions(expectedTransitions3);
+  jut.setVerifyTransitions(expectedTransitions5);
   // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
 
 
