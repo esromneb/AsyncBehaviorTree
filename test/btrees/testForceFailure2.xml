@@ -3,31 +3,37 @@
     <!-- ////////// -->
     <BehaviorTree ID="BehaviorTree">
         <Fallback>
-            <Action ID="go1"/>
+            <ForceFailure>
+                <Action ID="go1"/>
+            </ForceFailure>
             <ForceFailure>
                 <Sequence>
                     <Action ID="go2"/>
                     <Action ID="go3"/>
                 </Sequence>
             </ForceFailure>
-            <Sequence>
-                <ForceFailure>
-                    <ForceFailure>
-                        <Action ID="go4"/>
-                    </ForceFailure>
-                </ForceFailure>
-                <Action ID="go5"/>
-            </Sequence>
-            <Sequence>
+            <ForceFailure>
                 <Sequence>
-                    <Action ID="go6"/>
-                    <Action ID="go7"/>
                     <ForceFailure>
-                        <Action ID="go8"/>
+                        <ForceFailure>
+                            <Action ID="go4"/>
+                        </ForceFailure>
                     </ForceFailure>
+                    <Action ID="go5"/>
                 </Sequence>
-                <Action ID="go9"/>
-            </Sequence>
+            </ForceFailure>
+            <ForceFailure>
+                <Sequence>
+                    <Sequence>
+                        <Action ID="go6"/>
+                        <Action ID="go7"/>
+                        <ForceFailure>
+                            <Action ID="go8"/>
+                        </ForceFailure>
+                    </Sequence>
+                    <Action ID="go9"/>
+                </Sequence>
+            </ForceFailure>
         </Fallback>
     </BehaviorTree>
     <!-- ////////// -->

@@ -880,6 +880,7 @@ class AsyncBehaviorTree {
           anypass[ptr] = false;
           failUp(node);
         } else {
+          // istanbul ignore next
           if( !earlyFallback ) {
             // istanbul ignore next
             throw new Error(`Unknown types in finish pending: ${types[ptr]}`);
