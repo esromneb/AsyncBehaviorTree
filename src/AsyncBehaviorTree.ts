@@ -746,6 +746,11 @@ class AsyncBehaviorTree {
       if( skipThisNode ) {
         // do nothing
       } else if( nesting.has(node.w) ) {
+
+        if( ptr >= 0 ) {
+          hist[ptr].push(node);
+        }
+
         ptr++;
 
         // istanbul ignore if
