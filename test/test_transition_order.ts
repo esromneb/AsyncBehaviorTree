@@ -421,14 +421,38 @@ function force4(currentNodeId: number, hn:string): string {
   return hn;
 }
 
+const expectedTransitions4 = `
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> FAILURE
+FAILURE -> IDLE
+RUNNING -> FAILURE
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+FAILURE -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+`;
 
 
 
 
 
-
-
-test.skip("Test t05 log 4", async function(done) {
+test("Test t05 log 4", async function(done) {
   let print: boolean = false;
 
   let helper = new BlackboardT05Parent();
@@ -442,7 +466,7 @@ test.skip("Test t05 log 4", async function(done) {
   let jut = new MockAsyncBehaviorTreeJsonLogger(force4, {print, printTransitions: true});
   dut.setJsonLogger(jut);
 
-  // jut.setVerifyTransitions(expectedTransitions3);
+  jut.setVerifyTransitions(expectedTransitions4);
   // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
 
 
