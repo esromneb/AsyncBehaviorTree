@@ -43,6 +43,7 @@ let color = {
 'BgWhite' : "\x1b[47m",
 };
 
+let gPrintTransitions = false;
 
 
 class MockAsyncBehaviorTreeJsonLogger implements ABTJsonLogger{
@@ -148,7 +149,7 @@ class MockAsyncBehaviorTreeJsonLogger implements ABTJsonLogger{
 
     this.hardNames[''+this.currentNodeId] = hn;
 
-    if( this.options.print || true ) {
+    if( this.options.print ) {
       console.log(`set ${this.currentNodeId} = ${cb.path} = ${this.preNames[''+this.currentNodeId]}`);
     }
 
@@ -355,7 +356,7 @@ test("Test t05 log 3", async function(done) {
   dut.printParse = false;
 
 
-  let jut = new MockAsyncBehaviorTreeJsonLogger(force3, {print, printTransitions: true});
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force3, {print, printTransitions: true && gPrintTransitions});
   dut.setJsonLogger(jut);
 
   jut.setVerifyTransitions(expectedTransitions3);
@@ -463,7 +464,7 @@ test("Test t05 log 4", async function(done) {
   dut.printParse = false;
 
 
-  let jut = new MockAsyncBehaviorTreeJsonLogger(force4, {print, printTransitions: true});
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force4, {print, printTransitions: true && gPrintTransitions});
   dut.setJsonLogger(jut);
 
   jut.setVerifyTransitions(expectedTransitions4);
@@ -566,7 +567,7 @@ test("Test t05 log 5", async function(done) {
   dut.printParse = false;
 
 
-  let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true});
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true && gPrintTransitions});
   dut.setJsonLogger(jut);
 
   jut.setVerifyTransitions(expectedTransitions5);
@@ -625,7 +626,7 @@ test("Test t05 log 5 last node fails", async function(done) {
   dut.printParse = false;
 
 
-  let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true});
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true && gPrintTransitions});
   dut.setJsonLogger(jut);
 
   jut.setVerifyTransitions(expectedTransitions5A);
