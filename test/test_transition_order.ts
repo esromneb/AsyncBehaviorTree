@@ -552,9 +552,12 @@ test("Test t05 log 5", async function(done) {
   helper.reset();
 
   helper.fail['OpenDoor'] = true;
+  // helper.fail['CloseDoor'] = true;
   helper.fail['PassThroughDoor'] = true;
 
   await dut.execute();
+
+  expect(jut.transitionCount).toBe(jut.verifyTransitions.length);
 
   done();
 });

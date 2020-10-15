@@ -844,13 +844,6 @@ class AsyncBehaviorTree {
       if( skipThisNode ) {
         // do nothing
       } else if( nesting.has(node.w) ) {
-
-        if( ptr >= 0 ) {
-          // hist[ptr].push(node);
-        } else {
-          console.log("skipping pushing", node.path);
-        }
-
         ptr++;
 
         // istanbul ignore if
@@ -1033,6 +1026,14 @@ class AsyncBehaviorTree {
         // break; // uncomment to cause issue #35
       }
     } // while(...)
+
+    // console.log("ptr", ptr, anypass[ptr]);
+
+    if( ptr === 0 ) {
+      idleVisited(anypass[ptr]);
+      idleVisited(anypass[ptr]);
+    }
+
   } // execute
 
 
