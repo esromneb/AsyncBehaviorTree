@@ -655,28 +655,6 @@ class AsyncBehaviorTree {
     let notifyVisited = -1;
     let ptr = -1;
 
-    // const idleHistory = (): void => {
-    //   for(let n of hist[ptr]) {
-    //     // console.log('popLevel', n);
-    //     this.logTransition2(n, 0);
-    //   }
-    //   hist[ptr] = [];
-    // }
-
-    // const idleHistoryUp = (success: boolean): void => {
-    //   idleHistory();
-    //   debugger;
-    //   let ptr2 = ptr;
-
-    //   while(ptr2 >= 0 && pending[ptr2].length == 0) {
-    //     for(let n of hist[ptr2-1]) {
-    //       this.logTransition2(n, success?2:3);
-    //     }
-    //     hist[ptr2] = [];
-
-    //     ptr2--;
-    //   }
-    // }
 
     const idleVisited = (success: boolean): void => {
       let pp = visited.map(x=>x.path);
@@ -695,35 +673,23 @@ class AsyncBehaviorTree {
       let trueFound = 0;
 
       let needIdle = [];
-      let needSuccess = [];
+      let needSuccess = []; // only ever one of this
 
+
+      // we need to traverse the visited list backwards
+      // in order to know when to stop
+      // however once we know when to stop, we need to log
+      // in the forward direciton
+      // for this reason I push to a list and then reverse
       for(let i = rs.length-1; i >= 0; i--) {
-        // if( rs[i] ) {
 
-
-        //   break;
-        // } else {
-        // }
-
-        if( depth[i] === startDepth) {
-          // if( i > notifyVisited ) {
-            // this.logTransition2(visited[i], 0);
-
+        if( depth[i] === startDepth ) {
             needIdle.push(visited[i]);
-
             visited.splice(i, 1);
-
-            // doomed.push(visited[i])
-
-            // notifyVisited = Math.max(notifyVisited, i);
-          // }
-
         } else {
-          // this.logTransition2(visited[i], success?2:3);
           needSuccess.push(visited[i]);
           break;
         }
-
       }
 
       needIdle.reverse();
@@ -734,24 +700,21 @@ class AsyncBehaviorTree {
       for(let ns of needSuccess) {
         this.logTransition2(ns, success?2:3);
       }
-      // console.log('');
+    }
 
+    const idleTop = (): void => {
+      const top = this.accessNodeByPath("0");
+      this.logTransition2(top, 0);
     }
 
     const popLevel = (success: boolean): void => {
-      // idleHistoryUp(success);
-      debugger;
       idleVisited(success);
       pending.pop();
       types.pop();
       anypass.pop();
       meta.pop();
 
-      // hist.pop();
-
-
       ptr--;
-
     }
 
     const failUp = (og: any): void => {
@@ -764,14 +727,11 @@ class AsyncBehaviorTree {
         if( types[ptr] === 'sequence' || types[ptr] === 'repeat' ) {
           popLevel(false);
           node = this.getNodeParent(node);
-          this.logTransition(node, true, false);
         } else if( types[ptr] === 'retryuntilsuccesful' ) {
           if( meta[ptr].retry > 0 ) {
             // idleHistory();
-            // this.logTransition(node, anypass[ptr], false);
             break;
           }
-          // this.logTransition(node, anypass[ptr], false);
           popLevel(false);
         } else if( types[ptr] === 'fallback' || types[ptr] === 'inverter' || types[ptr] === 'forcesuccess' || types[ptr] === 'forcefailure' ) {
           node = this.getNodeParent(node);
@@ -855,17 +815,12 @@ class AsyncBehaviorTree {
         types  [ptr] = node.w;
         anypass[ptr] = false;
         meta   [ptr] = {};
-        // hist   [ptr] = [];
 
         if( node.w === 'repeat' ) {
           meta[ptr].repeat = parseInt(this.detectAndLoadBraceValues(node.args.num_cycles), 10);
         } else if( node.w === 'retryuntilsuccesful' ) {
           meta[ptr].retry = parseInt(this.detectAndLoadBraceValues(node.args.num_attempts), 10);
         }
-
-        // if( node.path === '0.1') {
-        //   debugger;
-        // }
 
         pending[ptr].unshift(...node.seq);
 
@@ -881,20 +836,13 @@ class AsyncBehaviorTree {
 
         this.logTransition2(node, 1);
 
-        // hist[ptr].push(node);
-
         const res = await this.callAction(node);
 
         if( this.destroyed ) {
           return;
         }
-
-        if( node.path === '0.1') {
-          debugger;
-        }
         
         this.logTransition2(node, res?2:3);
-
 
         if( res ) {
           anypass[ptr] = true;
@@ -902,10 +850,6 @@ class AsyncBehaviorTree {
 
         if(!res) {
           failUp(node);
-        }
-
-        if( node.path === '0.0.1.1.0' && meta[ptr].retry === 1 ) {
-          // console.log(types[ptr], '===', meta[ptr].retry);
         }
 
       } else if (node.w === 'setblackboard') {
@@ -1027,12 +971,13 @@ class AsyncBehaviorTree {
       }
     } // while(...)
 
-    // console.log("ptr", ptr, anypass[ptr]);
 
     if( ptr === 0 ) {
-      idleVisited(anypass[ptr]);
+      // this means we passed
       idleVisited(anypass[ptr]);
     }
+    idleTop();
+
 
   } // execute
 

@@ -552,7 +552,65 @@ test("Test t05 log 5", async function(done) {
   helper.reset();
 
   helper.fail['OpenDoor'] = true;
-  // helper.fail['CloseDoor'] = true;
+  helper.fail['PassThroughDoor'] = true;
+
+  await dut.execute();
+
+  expect(jut.transitionCount).toBe(jut.verifyTransitions.length);
+
+  done();
+});
+
+const expectedTransitions5A = `
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> FAILURE
+SUCCESS -> IDLE
+FAILURE -> IDLE
+RUNNING -> FAILURE
+FAILURE -> IDLE
+`;
+
+
+// same as above, but CloseDoor fails
+test("Test t05 log 5 last node fails", async function(done) {
+  let print: boolean = false;
+
+  let helper = new BlackboardT05Parent();
+
+  let dut = new AsyncBehaviorTree(testT05_5, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true});
+  dut.setJsonLogger(jut);
+
+  jut.setVerifyTransitions(expectedTransitions5A);
+
+
+  helper.reset();
+
+  helper.fail['OpenDoor'] = true;
+  helper.fail['CloseDoor'] = true;
   helper.fail['PassThroughDoor'] = true;
 
   await dut.execute();
