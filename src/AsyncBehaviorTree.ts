@@ -650,18 +650,18 @@ class AsyncBehaviorTree {
     const types: string[] = [];
     const anypass: boolean[] = [];
     const meta: any[] = [];
-    const hist: any[] = [];
+    // const hist: any[] = [];
     const visited: any[] = [];
     let notifyVisited = -1;
     let ptr = -1;
 
-    const idleHistory = (): void => {
-      for(let n of hist[ptr]) {
-        // console.log('popLevel', n);
-        this.logTransition2(n, 0);
-      }
-      hist[ptr] = [];
-    }
+    // const idleHistory = (): void => {
+    //   for(let n of hist[ptr]) {
+    //     // console.log('popLevel', n);
+    //     this.logTransition2(n, 0);
+    //   }
+    //   hist[ptr] = [];
+    // }
 
     // const idleHistoryUp = (success: boolean): void => {
     //   idleHistory();
@@ -747,7 +747,7 @@ class AsyncBehaviorTree {
       anypass.pop();
       meta.pop();
 
-      hist.pop();
+      // hist.pop();
 
 
       ptr--;
@@ -767,7 +767,7 @@ class AsyncBehaviorTree {
           this.logTransition(node, true, false);
         } else if( types[ptr] === 'retryuntilsuccesful' ) {
           if( meta[ptr].retry > 0 ) {
-            idleHistory();
+            // idleHistory();
             // this.logTransition(node, anypass[ptr], false);
             break;
           }
@@ -846,7 +846,7 @@ class AsyncBehaviorTree {
       } else if( nesting.has(node.w) ) {
 
         if( ptr >= 0 ) {
-          hist[ptr].push(node);
+          // hist[ptr].push(node);
         } else {
           console.log("skipping pushing", node.path);
         }
@@ -862,7 +862,7 @@ class AsyncBehaviorTree {
         types  [ptr] = node.w;
         anypass[ptr] = false;
         meta   [ptr] = {};
-        hist   [ptr] = [];
+        // hist   [ptr] = [];
 
         if( node.w === 'repeat' ) {
           meta[ptr].repeat = parseInt(this.detectAndLoadBraceValues(node.args.num_cycles), 10);
@@ -888,7 +888,7 @@ class AsyncBehaviorTree {
 
         this.logTransition2(node, 1);
 
-        hist[ptr].push(node);
+        // hist[ptr].push(node);
 
         const res = await this.callAction(node);
 
@@ -926,7 +926,7 @@ class AsyncBehaviorTree {
         anypass[ptr] = true;
 
       } else if (node.w === 'condition') {
-        hist[ptr].push(node);
+        // hist[ptr].push(node);
         const res = this.evaluateCondition(node.name);
 
         this.logTransition(node, false, res);
