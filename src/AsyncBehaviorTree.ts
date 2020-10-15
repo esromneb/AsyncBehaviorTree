@@ -614,6 +614,21 @@ class AsyncBehaviorTree {
     return true;
   }
 
+  // is there a node to the right at the same depth/level of the tree
+  // (note a parallel tree of the same depth but with a different parent doesn't count)
+  // pathHasRightSibling(path: string): boolean {
+
+  //   let ps = this.arrayForPath(path);
+
+  //   ps[ps.length-1]++;
+
+  //   let path2 = this.pathForArray(ps);
+
+  //   let valid = !!this.accessNodeByPath(path2);
+
+  //   return valid;
+  // }
+
   // see https://medium.com/@kenny.hom27/breadth-first-vs-depth-first-tree-traversal-in-javascript-48df2ebfc6d1#fe0b
   // this is a DFS through the behavior tree (this.exe)
   // we save the current level into the pending[]
@@ -635,9 +650,53 @@ class AsyncBehaviorTree {
     const types: string[] = [];
     const anypass: boolean[] = [];
     const meta: any[] = [];
+    const visited: any[] = [];
+    let notifyVisited = -1;
     let ptr = -1;
 
+
+    const idleVisited = (success: boolean): void => {
+      const pp = visited.map(x=>x.path);
+      const depth = pp.map(x=>this.arrayForPath(x).length);
+      const startDepth = depth[depth.length-1];
+
+      let needIdle = [];
+      let needSuccess = []; // only ever one of this
+
+
+      // we need to traverse the visited list backwards
+      // in order to know when to stop
+      // however once we know when to stop, we need to log
+      // in the forward direciton
+      // for this reason I push to a list and then reverse
+      for(let i = pp.length-1; i >= 0; i--) {
+
+        if( depth[i] === startDepth ) {
+            needIdle.push(visited[i]);
+            visited.splice(i, 1);
+        } else {
+          needSuccess.push(visited[i]);
+          break;
+        }
+      }
+
+      needIdle.reverse();
+      for(let ne of needIdle) {
+        this.logTransition2(ne, 0);
+      }
+
+      for(let ns of needSuccess) {
+        this.logTransition2(ns, success?2:3);
+      }
+    }
+
+    const idleTop = (): void => {
+      const top = this.accessNodeByPath("0");
+      this.logTransition2(top, 0);
+    }
+
     const popLevel = (success: boolean): void => {
+      idleVisited(success);
       pending.pop();
       types.pop();
       anypass.pop();
@@ -655,17 +714,13 @@ class AsyncBehaviorTree {
         if( types[ptr] === 'sequence' || types[ptr] === 'repeat' ) {
           popLevel(false);
           node = this.getNodeParent(node);
-          this.logTransition(node, true, false);
         } else if( types[ptr] === 'retryuntilsuccesful' ) {
           if( meta[ptr].retry > 0 ) {
-            this.logTransition(node, anypass[ptr], false);
             break;
           }
-          this.logTransition(node, anypass[ptr], false);
           popLevel(false);
         } else if( types[ptr] === 'fallback' || types[ptr] === 'inverter' || types[ptr] === 'forcesuccess' || types[ptr] === 'forcefailure' ) {
           node = this.getNodeParent(node);
-          this.logTransition(node, true, false);
           // do nothing, see logic below
           break;
         } else {
@@ -718,6 +773,8 @@ class AsyncBehaviorTree {
         node = collection.shift();
       }
 
+      visited.push(node);
+
       // istanbul ignore if
       if(node == undefined) {
         throw new Error(`node cannot be undefined here`);
@@ -762,13 +819,15 @@ class AsyncBehaviorTree {
 
         // console.log(meta[ptr]);
 
+        this.logTransition2(node, 1);
+
         const res = await this.callAction(node);
 
         if( this.destroyed ) {
           return;
         }
-
-        this.logTransition(node, false, res);
+        
+        this.logTransition2(node, res?2:3);
 
         if( res ) {
           anypass[ptr] = true;
@@ -821,11 +880,12 @@ class AsyncBehaviorTree {
       }
 
       // if we are empty we need to decide pop behavior
-      while( (ptr > 0 && pending[ptr].length == 0) || (ptr >= 0 && types[ptr] === 'fallback') ) {
+      while( (ptr > 0 && pending[ptr].length === 0) || (ptr >= 0 && types[ptr] === 'fallback' && anypass[ptr]) ) {
 
-        const earlyFallback = (ptr >= 0 && types[ptr] === 'fallback') && pending[ptr].length !== 0;
+        const earlyFallback = (ptr >= 0 && types[ptr] === 'fallback' && anypass[ptr]) && pending[ptr].length !== 0;
 
         if( earlyFallback ) {
+          // debugger;
           const anySaved = anypass[ptr];
           if( anySaved ) {
             popLevel(true);
@@ -839,7 +899,6 @@ class AsyncBehaviorTree {
         if( !earlyFallback && types[ptr] === 'fallback' ) {
           const anySaved = anypass[ptr];
           popLevel(true);
-          this.logTransition(this.getNodeParent(node), true, true);
           if( anySaved ) {
             // we got at least 1 pass in our fallback, just move on
           } else {
@@ -850,15 +909,14 @@ class AsyncBehaviorTree {
           }
         } else if( types[ptr] === 'inverter' ) {
           const anySaved = anypass[ptr];
+          this.logTransition(this.getNodeParent(node), true, !anySaved);
           popLevel(true);
-          this.logTransition(this.getNodeParent(node), true, false);
           if( anySaved ) {
             failUp(node);
             // this.logTransition(node, true, false);
           }
         } else if( types[ptr] === 'sequence' || types[ptr] === 'forcesuccess' ) {
           popLevel(true);
-          this.logTransition(this.getNodeParent(node), true, true);
           // we are popping a sequence if we get here the sequence succeded
           // we must mark anypass as true for the new level for #35 (part 2)
           anypass[ptr] = true;
@@ -889,6 +947,15 @@ class AsyncBehaviorTree {
         // break; // uncomment to cause issue #35
       }
     } // while(...)
+
+
+    if( ptr === 0 ) {
+      // this means we passed
+      idleVisited(anypass[ptr]);
+    }
+    idleTop();
+
+
   } // execute
 
 
@@ -1048,6 +1115,8 @@ class AsyncBehaviorTree {
     let slc = ps.slice(0,j);
 
     node.path = slc.join('.');
+
+    this.prevNodeState[node.path] = 0;
   }
 
   // note types with ports
@@ -1557,19 +1626,33 @@ class AsyncBehaviorTree {
   //    success: 2,
   //    failure: 3
 
+  prevNodeState: any = {};
+
   logPrevState: number = 0;
+
+  private logTransition2(node: any, status: number): void {
+    if( !this.logger ) {
+      return;
+    }
+    let prev = this.prevNodeState[node.path];
+    this.logger.logTransition(node.uid, prev, status);
+    this.prevNodeState[node.path] = status;
+  }
 
   private logTransition(node: any, pop: boolean, result?: boolean): void {
     if( !this.logger ) {
       return;
     }
 
+    let prev = this.prevNodeState[node.path];
+
     const nest = this.nestingTypes.has(node.w);
 
     if( nest ) {
 
       if( !pop ) {
-        this.logger.logTransition(node.uid, 0, 1);
+        this.logger.logTransition(node.uid, prev, 1);
+        this.prevNodeState[node.path] = 1;
       } else {
 
         let cur = 3;
@@ -1582,7 +1665,8 @@ class AsyncBehaviorTree {
         //   cur = 0;
         // }
       
-        this.logger.logTransition(node.uid, 0, cur);
+        this.logger.logTransition(node.uid, prev, cur);
+        this.prevNodeState[node.path] = cur;
 
       }
 
@@ -1594,7 +1678,8 @@ class AsyncBehaviorTree {
         cur = 2;
       }
 
-      this.logger.logTransition(node.uid, 0, cur);
+      this.logger.logTransition(node.uid, prev, cur);
+      this.prevNodeState[node.path] = cur;
     }
 
   }

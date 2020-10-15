@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<root main_tree_to_execute="MainTree">
+    <!-- ////////// -->
+    <BehaviorTree ID="MainTree">
+        <Sequence name="SeqA">
+            <Sequence>
+                <Sequence name="SeqB">
+                    <Action ID="PassThroughWindow"/>
+                </Sequence>
+                <Sequence name="SeqE">
+                    <Action ID="PassThroughWindow"/>
+                    <Action ID="PassThroughWindow"/>
+                </Sequence>
+            </Sequence>
+            <Action ID="CloseDoor"/>
+        </Sequence>
+    </BehaviorTree>
+    <!-- ////////// -->
+    <TreeNodesModel>
+        <Action ID="CloseDoor"/>
+        <Condition ID="IsDoorOpen"/>
+        <Action ID="OpenDoor"/>
+        <Action ID="PassThroughDoor"/>
+        <Action ID="PassThroughWindow"/>
+    </TreeNodesModel>
+    <!-- ////////// -->
+</root>
+

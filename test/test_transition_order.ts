@@ -8,6 +8,9 @@ import {
 BlackboardT05Parent
 } from "./helpers/BlackboardT05Parent";
 const testT05 = require("./btrees/t05CrossdoorNoSubtree.xml");
+const testT05_3 = require("./btrees/t05Crossdoor3.xml");
+const testT05_4 = require("./btrees/t05Crossdoor4.xml");
+const testT05_5 = require("./btrees/t05Crossdoor5.xml");
 
 const util = require('util');
 
@@ -40,6 +43,7 @@ let color = {
 'BgWhite' : "\x1b[47m",
 };
 
+let gPrintTransitions = false;
 
 
 class MockAsyncBehaviorTreeJsonLogger implements ABTJsonLogger{
@@ -48,7 +52,10 @@ class MockAsyncBehaviorTreeJsonLogger implements ABTJsonLogger{
 
   savedXml: string;
 
-  constructor(public options: any = {print:false}) {
+  verifyTransitions = undefined;
+  verifyNodes = undefined;
+
+  constructor(public forceCb: any, public options: any = {print:false,printTransitions:true}) {
     this.currentNodeId = this.nodeOffset;
   }
 
@@ -76,16 +83,27 @@ class MockAsyncBehaviorTreeJsonLogger implements ABTJsonLogger{
     const path = this.pathForNode[uid];
     const name = this.hardNames[uid];
 
-    const p = this.colorNameForStatus[prev_status];
-    const s = this.colorNameForStatus[status];
+    const cp = this.colorNameForStatus[prev_status];
+    const cs = this.colorNameForStatus[status];
+    const p = this.nameForStatus[prev_status];
+    const s = this.nameForStatus[status];
 
-    let len = p.length + s.length;
+    let len = cp.length + cs.length;
 
 
 
-    if(this.options.print || true) {
-      console.log(`${name.padEnd(26,' ')} ${p} -> ${s}      ${path.padStart(40-len+path.length, ' ')}`);
+    if(this.options.printTransitions) {
+      console.log(`${name.padEnd(26,' ')} ${cp} -> ${cs}      ${path.padStart(40-len+path.length, ' ')}`);
     }
+
+
+    if( this.verifyTransitions != undefined && this.transitionCount < this.verifyTransitions.length ) {
+      const got = `${p} -> ${s}`;
+      const expected = this.verifyTransitions[this.transitionCount];
+      expect(got).toBe(expected);
+
+    }
+
     this.transitionCount++;
   }
 
@@ -127,47 +145,61 @@ class MockAsyncBehaviorTreeJsonLogger implements ABTJsonLogger{
     
     let hn = cb.name || cb.w;
 
-    switch(this.currentNodeId) {
-      case 100:
-        hn = 'Sequence';
-        break;
-      case 101:
-        hn = 'root_Fallback';
-        break;
-      case 102:
-        hn = 'door_open_sequence';
-        break;
-      case 103:
-        hn = 'IsDoorOpen';
-        break;
-      case 105:
-        hn = 'door_closed_sequence';
-        break;
-      case 106:
-        hn = 'Inverter';
-        break;
-      case 108:
-        hn = 'RetryUntilSuccessful';
-        break;
-    }
+    hn = this.forceCb(this.currentNodeId, hn);
+
     this.hardNames[''+this.currentNodeId] = hn;
 
-    if( this.options.print || true ) {
+    if( this.options.print ) {
       console.log(`set ${this.currentNodeId} = ${cb.path} = ${this.preNames[''+this.currentNodeId]}`);
     }
 
     this.currentNodeId++;
   }
 
+  setVerifyTransitions(r: string): void {
+    let s1 = r.split('\n').filter(x=>x.length!==0);
+    // console.log(s1);
 
+    this.verifyTransitions = s1;
+
+  }
+
+
+}
+
+function force1(currentNodeId: number, hn:string): string {
+
+  switch(this.currentNodeId) {
+    case 100:
+      hn = 'Sequence';
+      break;
+    case 101:
+      hn = 'root_Fallback';
+      break;
+    case 102:
+      hn = 'door_open_sequence';
+      break;
+    case 103:
+      hn = 'IsDoorOpen';
+      break;
+    case 105:
+      hn = 'door_closed_sequence';
+      break;
+    case 106:
+      hn = 'Inverter';
+      break;
+    case 108:
+      hn = 'RetryUntilSuccessful';
+      break;
+  }
+
+  return hn;
 }
 
 
 
-
-
 // copied from test_abt_one nested sequence
-test("Test AlwaysFailure", async function(done) {
+test.skip("Test t05 log", async function(done) {
 
 
   let print: boolean = false;
@@ -181,11 +213,13 @@ test("Test AlwaysFailure", async function(done) {
   dut.printParse = false;
 
 
-  let jut = new MockAsyncBehaviorTreeJsonLogger({print});
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force1, {print, printTransitions: true});
   dut.setJsonLogger(jut);
 
 
   helper.reset();
+
+  helper.fail['OpenDoor'] = true;
 
   await dut.execute();
 
@@ -204,3 +238,409 @@ test("Test AlwaysFailure", async function(done) {
 
 });
 
+
+function force3(currentNodeId: number, hn:string): string {
+
+  switch(this.currentNodeId) {
+    case 100:
+      hn = 'SeqA';
+      break;
+    case 101:
+      hn = 'root_Fallback';
+      break;
+    case 102:
+      hn = 'SeqB';
+      break;
+    case 104:
+      hn = 'SeqC';
+      break;
+    case 107:
+      hn = 'SeqD';
+      break;
+    case 112:
+      hn = 'SeqE';
+      break;
+    case 114:
+      hn = 'SeqF';
+      break;
+    case 116:
+      hn = 'SeqG';
+      break;
+  }
+
+  return hn;
+}
+
+const expectedTransitions3 = `
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> FAILURE
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+FAILURE -> IDLE
+RUNNING -> FAILURE
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+FAILURE -> IDLE
+RUNNING -> FAILURE
+SUCCESS -> IDLE
+FAILURE -> IDLE
+RUNNING -> FAILURE
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+FAILURE -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+`;
+
+
+
+
+
+
+test("Test t05 log 3", async function(done) {
+
+
+  let print: boolean = false;
+
+
+  let helper = new BlackboardT05Parent();
+
+  let dut = new AsyncBehaviorTree(testT05_3, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force3, {print, printTransitions: true && gPrintTransitions});
+  dut.setJsonLogger(jut);
+
+  jut.setVerifyTransitions(expectedTransitions3);
+
+  // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
+
+
+  helper.reset();
+
+  helper.fail['OpenDoor'] = true;
+  helper.fail['PassThroughDoor'] = true;
+
+  await dut.execute();
+
+  // console.log(helper.blackBoard.called);
+
+    // if( print ) {
+    //   console.log('called', helper.blackBoard.called);
+    // }
+
+
+  // expect(helper.blackBoard.called).toStrictEqual(['go1']);
+  // }
+
+
+  done();
+
+});
+
+
+
+
+
+function force4(currentNodeId: number, hn:string): string {
+
+  switch(this.currentNodeId) {
+    case 100:
+      hn = 'SeqA';
+      break;
+    case 101:
+      hn = 'root_Fallback';
+      break;
+    case 102:
+      hn = 'SeqB';
+      break;
+    case 104:
+      hn = 'SeqE';
+      break;
+    // case 107:
+    //   hn = 'SeqD';
+    //   break;
+    // case 112:
+    //   hn = 'SeqE';
+    //   break;
+    // case 114:
+    //   hn = 'SeqF';
+    //   break;
+    // case 116:
+    //   hn = 'SeqG';
+    //   break;
+  }
+
+  return hn;
+}
+
+const expectedTransitions4 = `
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> FAILURE
+FAILURE -> IDLE
+RUNNING -> FAILURE
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+FAILURE -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+`;
+
+
+
+
+
+test("Test t05 log 4", async function(done) {
+  let print: boolean = false;
+
+  let helper = new BlackboardT05Parent();
+
+  let dut = new AsyncBehaviorTree(testT05_4, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force4, {print, printTransitions: true && gPrintTransitions});
+  dut.setJsonLogger(jut);
+
+  jut.setVerifyTransitions(expectedTransitions4);
+  // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
+
+
+  helper.reset();
+
+  helper.fail['OpenDoor'] = true;
+  helper.fail['PassThroughDoor'] = true;
+
+  await dut.execute();
+
+  done();
+});
+
+
+
+
+
+
+
+function force5(currentNodeId: number, hn:string): string {
+
+  switch(this.currentNodeId) {
+    case 100:
+      hn = 'SeqA';
+      break;
+    case 101:
+      hn = 'Sequence';
+      break;
+    case 102:
+      hn = 'SeqB';
+      break;
+    case 104:
+      hn = 'SeqE';
+      break;
+    // case 107:
+    //   hn = 'SeqD';
+    //   break;
+    // case 112:
+    //   hn = 'SeqE';
+    //   break;
+    // case 114:
+    //   hn = 'SeqF';
+    //   break;
+    // case 116:
+    //   hn = 'SeqG';
+    //   break;
+  }
+
+  return hn;
+}
+
+
+
+
+
+const expectedTransitions5 = `
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+`;
+
+
+
+
+// First one I got working
+// however as of now it's short due to shenanigans with the ptr = -1
+// stuff.  I need a way to fix this without affecting call order
+test("Test t05 log 5", async function(done) {
+  let print: boolean = false;
+
+  let helper = new BlackboardT05Parent();
+
+  let dut = new AsyncBehaviorTree(testT05_5, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true && gPrintTransitions});
+  dut.setJsonLogger(jut);
+
+  jut.setVerifyTransitions(expectedTransitions5);
+  // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
+
+
+  helper.reset();
+
+  helper.fail['OpenDoor'] = true;
+  helper.fail['PassThroughDoor'] = true;
+
+  await dut.execute();
+
+  expect(jut.transitionCount).toBe(jut.verifyTransitions.length);
+
+  done();
+});
+
+const expectedTransitions5A = `
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+SUCCESS -> IDLE
+SUCCESS -> IDLE
+RUNNING -> SUCCESS
+IDLE -> RUNNING
+RUNNING -> FAILURE
+SUCCESS -> IDLE
+FAILURE -> IDLE
+RUNNING -> FAILURE
+FAILURE -> IDLE
+`;
+
+
+// same as above, but CloseDoor fails
+test("Test t05 log 5 last node fails", async function(done) {
+  let print: boolean = false;
+
+  let helper = new BlackboardT05Parent();
+
+  let dut = new AsyncBehaviorTree(testT05_5, helper.blackBoard);
+
+  dut.printCall = false;
+  dut.printParse = false;
+
+
+  let jut = new MockAsyncBehaviorTreeJsonLogger(force5, {print, printTransitions: true && gPrintTransitions});
+  dut.setJsonLogger(jut);
+
+  jut.setVerifyTransitions(expectedTransitions5A);
+
+
+  helper.reset();
+
+  helper.fail['OpenDoor'] = true;
+  helper.fail['CloseDoor'] = true;
+  helper.fail['PassThroughDoor'] = true;
+
+  await dut.execute();
+
+  expect(jut.transitionCount).toBe(jut.verifyTransitions.length);
+
+  done();
+});
