@@ -885,14 +885,8 @@ class AsyncBehaviorTree {
         const earlyFallback = (ptr >= 0 && types[ptr] === 'fallback' && anypass[ptr]) && pending[ptr].length !== 0;
 
         if( earlyFallback ) {
-          // debugger;
-          const anySaved = anypass[ptr];
-          if( anySaved ) {
-            popLevel(true);
-            continue;
-          } else {
-            break;
-          }
+          popLevel(true);
+          continue;
         }
 
         // debugger;
