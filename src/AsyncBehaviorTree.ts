@@ -616,18 +616,18 @@ class AsyncBehaviorTree {
 
   // is there a node to the right at the same depth/level of the tree
   // (note a parallel tree of the same depth but with a different parent doesn't count)
-  pathHasRightSibling(path: string): boolean {
+  // pathHasRightSibling(path: string): boolean {
 
-    let ps = this.arrayForPath(path);
+  //   let ps = this.arrayForPath(path);
 
-    ps[ps.length-1]++;
+  //   ps[ps.length-1]++;
 
-    let path2 = this.pathForArray(ps);
+  //   let path2 = this.pathForArray(ps);
 
-    let valid = !!this.accessNodeByPath(path2);
+  //   let valid = !!this.accessNodeByPath(path2);
 
-    return valid;
-  }
+  //   return valid;
+  // }
 
   // see https://medium.com/@kenny.hom27/breadth-first-vs-depth-first-tree-traversal-in-javascript-48df2ebfc6d1#fe0b
   // this is a DFS through the behavior tree (this.exe)
@@ -657,20 +657,9 @@ class AsyncBehaviorTree {
 
 
     const idleVisited = (success: boolean): void => {
-      let pp = visited.map(x=>x.path);
-      let rs = visited.map(x=>this.pathHasRightSibling(x.path));
-      let depth = pp.map(x=>this.arrayForPath(x).length);
-      // console.log(pp);
-      // console.log(depth);
-      // console.log('');
-
-      let startDepth = depth[depth.length-1];
-      // console.log(rs);
-      // console.log(pending.map(x=>x.length));
-
-      let doomed = [];
-
-      let trueFound = 0;
+      const pp = visited.map(x=>x.path);
+      const depth = pp.map(x=>this.arrayForPath(x).length);
+      const startDepth = depth[depth.length-1];
 
       let needIdle = [];
       let needSuccess = []; // only ever one of this
@@ -681,7 +670,7 @@ class AsyncBehaviorTree {
       // however once we know when to stop, we need to log
       // in the forward direciton
       // for this reason I push to a list and then reverse
-      for(let i = rs.length-1; i >= 0; i--) {
+      for(let i = pp.length-1; i >= 0; i--) {
 
         if( depth[i] === startDepth ) {
             needIdle.push(visited[i]);
@@ -713,7 +702,6 @@ class AsyncBehaviorTree {
       types.pop();
       anypass.pop();
       meta.pop();
-
       ptr--;
     }
 
@@ -898,12 +886,12 @@ class AsyncBehaviorTree {
       }
 
       // if we are empty we need to decide pop behavior
-      while( (ptr > 0 && pending[ptr].length == 0) || (ptr >= 0 && types[ptr] === 'fallback' && anypass[ptr]) ) {
+      while( (ptr > 0 && pending[ptr].length === 0) || (ptr >= 0 && types[ptr] === 'fallback' && anypass[ptr]) ) {
 
         const earlyFallback = (ptr >= 0 && types[ptr] === 'fallback' && anypass[ptr]) && pending[ptr].length !== 0;
 
         if( earlyFallback ) {
-          debugger;
+          // debugger;
           const anySaved = anypass[ptr];
           if( anySaved ) {
             popLevel(true);
@@ -915,7 +903,7 @@ class AsyncBehaviorTree {
 
         // debugger;
         if( !earlyFallback && types[ptr] === 'fallback' ) {
-          debugger;
+          // debugger;
           const anySaved = anypass[ptr];
           popLevel(true);
           // console.log(this.getNodeParent(node));
@@ -937,7 +925,7 @@ class AsyncBehaviorTree {
             // this.logTransition(node, true, false);
           }
         } else if( types[ptr] === 'sequence' || types[ptr] === 'forcesuccess' ) {
-          debugger;
+          // debugger;
           popLevel(true);
           // this.logTransition(this.getNodeParent(node), true, true);
           // we are popping a sequence if we get here the sequence succeded
@@ -1665,10 +1653,6 @@ class AsyncBehaviorTree {
   private logTransition(node: any, pop: boolean, result?: boolean): void {
     if( !this.logger ) {
       return;
-    }
-
-    if( node.path === '0.0.1' ) {
-      debugger;
     }
 
     let prev = this.prevNodeState[node.path];
