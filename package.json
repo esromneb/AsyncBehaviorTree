@@ -1,6 +1,6 @@
 {
   "name": "async-behavior-tree",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Behavior Tree library focusing on async functions",
   "main": "dist/AsyncBehaviorTree.js",
   "types": "dist/AsyncBehaviorTree.d.ts",
