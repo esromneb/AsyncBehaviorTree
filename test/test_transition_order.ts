@@ -341,7 +341,7 @@ SUCCESS -> IDLE
 
 
 
-test.skip("Test t05 log 3", async function(done) {
+test("Test t05 log 3", async function(done) {
 
 
   let print: boolean = false;
@@ -358,7 +358,7 @@ test.skip("Test t05 log 3", async function(done) {
   let jut = new MockAsyncBehaviorTreeJsonLogger(force3, {print, printTransitions: true});
   dut.setJsonLogger(jut);
 
-  // jut.setVerifyTransitions(expectedTransitions3);
+  jut.setVerifyTransitions(expectedTransitions3);
 
   // jut.verifyTransitions = jut.verifyTransitions.slice(0,26);
 
