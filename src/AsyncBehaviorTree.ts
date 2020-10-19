@@ -271,7 +271,9 @@ class AsyncBehaviorTree {
 
     for(let i = 0; i < ls.length; i++) {
       let layer = ls[i];
-      if(unpack[layer] == undefined) {
+      // this was == however I now want this to be ===
+      // I don't want null to trigger this
+      if(unpack[layer] === undefined) {
         this.warning(`got 'undefined' value from blackboard when looking for '${layer}' of '${rawValue}'`);
         return undefined;
       }
@@ -327,7 +329,7 @@ class AsyncBehaviorTree {
     let i = 0;
     for(i = 0; i < ls.length-1; i++) {
       layer = ls[i];
-      if(unpack[layer] == undefined) {
+      if(unpack[layer] === undefined) {
         if( this.warnWhenCreatingNewObjects ) {
           this.warning(`making new object on blackboard '${layer}' while writing to '${rawValue}'`);
         }
@@ -339,7 +341,7 @@ class AsyncBehaviorTree {
 
 
     // istanbul ignore if
-    if( unpack == undefined ) {
+    if( unpack === undefined ) {
       this.warning("Internal Error: Loop in detectAndStoreBraceValues() failed to set undefined for '${rawValue}'");
       return false;
     }
@@ -447,7 +449,7 @@ class AsyncBehaviorTree {
         const gotBack = result[port.name];
 
         // istanbul ignore if
-        if( gotBack == undefined ) {
+        if( gotBack === undefined ) {
           this.warning(`${rawValue} was not found in result object`);
           continue;
         }
@@ -551,7 +553,7 @@ class AsyncBehaviorTree {
 
 
 
-    if( this.warnUndefinedReturn && result == undefined ) {
+    if( this.warnUndefinedReturn && result === undefined ) {
       this.warning(`${n} returned 'undefined' and thus will fail`);
     }
 
